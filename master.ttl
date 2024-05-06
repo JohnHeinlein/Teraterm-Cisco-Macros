@@ -1,0 +1,71 @@
+;=========================
+; 
+;=========================
+statstr = ''
+gethostname hostname
+statusbox statstr hostname
+
+setsync 1
+sendln 'version'
+recvln ; First captures the command i just sent? lol
+recvln
+setsync 0
+if result = 1 then
+	; WS-C2960X
+	strmatch inputstr '^C2960X\s'
+	if result = 1 then
+		strconcat statstr '**C2960X ROMMON Detected**'
+		statusbox statstr hostname
+		include 'rommon\2960x.ttl'
+		goto boot_switch
+	endif
+	
+	; WS-C2960
+	strmatch inputstr '^C2960\s'
+	if result = 1 then
+		strconcat statstr '**2960 ROMMON Detected**'
+		statusbox statstr hostname
+		include 'rommon\2960x.ttl' ; No difference found so far
+		goto boot_switch
+	endif
+	
+	strmatch inputstr '^C2960S\s'
+	if result = 1 then
+		strconcat statstr '**2960S ROMMON Detected**'
+		statusbox statstr hostname
+		include 'rommon\2960x.ttl' ; No difference found so far
+		goto boot_switch
+	endif
+	
+	; If version fails, it should be a router
+	strmatch inputstr 'command \"version\" not found'
+	if result > 0 then
+		setsync 1
+		sendln ''
+		recvln
+		setsync 0
+		
+		strmatch inputstr 'rommon [0-9]+'
+		if result = 1 then
+			strconcat statstr '"version" command invalid, Router assumed'
+			statusbox statstr hostname
+			include 'rommon\isr.ttl'
+			goto boot_router
+		endif
+
+	endif
+	
+	goto no_match
+endif
+
+:boot_switch ;Re-entry point after ROMMON
+include 'os\switch.ttl' ;Waits for RETURN prompt
+exit
+
+:boot_router
+include 'os\router.ttl'
+exit
+
+:no_match
+messagebox 'No supported device detected, exiting' 'Err'
+exit

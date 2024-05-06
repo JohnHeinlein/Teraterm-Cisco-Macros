@@ -1,0 +1,44 @@
+; This file just contains delete statements for basic ROMMON files, so they don't need to be repeated
+
+strconcat statstr #10'Wiping standard switch files...'
+statusbox statstr hostname
+
+timeout = 0 ; drop timeout once flash has intialized
+
+setsync 1
+;include 'util\dir_flash.ttl' ; List flash contents
+
+;pause 5
+wait #10'switch:'
+sendln 'del flash:config.text'
+wait '(y/n)?'
+sendln 'y'
+
+wait #10'switch:'
+;pause 1
+sendln 'del flash:private-config.text'
+wait '(y/n)?'
+sendln 'y'
+
+wait #10'switch:'
+;pause 1
+sendln 'del flash:vlan.dat'
+wait '(y/n)?'
+sendln 'y'
+
+wait #10'switch:'
+;pause 1
+sendln 'del flash:multiple-fs'
+wait '(y/n)?'
+sendln 'y'
+
+wait #10'switch:'
+;pause 1
+
+include 'util\dir_flash.ttl'
+
+setsync 0
+
+strconcat statstr ' done!'
+statusbox statstr hostname
+exit

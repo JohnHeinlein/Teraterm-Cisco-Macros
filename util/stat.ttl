@@ -1,0 +1,65 @@
+; ===== ===== ===== ===== =====
+; Subroutine for printing to status box
+; Automatically scrolls if we exceed string length
+; Called as:
+;	newstat = 'new status line'
+;	include 'util\stat.ttl'
+; ===== ===== ===== ===== =====
+
+debug = 0
+if debug = 1 newstat = 'FOOBAR'
+
+; init
+ifdefined statstr
+if result = 0 statstr = ''
+
+ifdefined hostname
+if result = 0 gethostname hostname
+
+ifdefined newstat
+if result = 0 messagebox 'ERR: newstat undefined!' 'ERR'
+;/init
+
+; Cache global vars so we don't have side effects
+tmp_result = result
+tmp_groupmatchstr1 = groupmatchstr1
+tmp_groupmatchstr2 = groupmatchstr2
+; /cache
+
+tmpcnt = 50
+while tmpcnt > 0
+	int2str tmpcnt_str tmpcnt
+	strconcat statstr tmpcnt_str
+	strconcat statstr '_foobar_fizzbuzz'#10
+	tmpcnt = tmpcnt - 1
+endwhile
+messagebox statstr 'debug'
+; /debug
+
+do
+	strlen statstr
+	len_stat = result
+
+	strlen newstat
+	len_newstat = result
+
+	strsplit statstr #10 2
+	
+	if debug = 1 messagebox groupmatchstr1 'First match'
+	if debug = 1 messagebox groupmatchstr2 'Second match'
+	
+	statstr = groupmatchstr2
+loop while (len_stat + len_newstat) > 510 ;511 max len, keep space for newline
+
+
+strconcat statstr #10
+strconcat statstr newstat
+strlen statstr
+if debug = 1 messagebox statstr result
+
+statusbox statstr hostname
+
+; Restore global variables
+result = tmp_result
+groupmatchstr1 = tmp_groupmatchstr1_tmp
+groupmatchstr2 = tmp_groupmatchstr2

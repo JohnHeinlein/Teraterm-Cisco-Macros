@@ -1,0 +1,13 @@
+; Some devices will have enough files to trigger a "more" prompt when listing contents
+
+timeout_tmp = timeout
+timeout = 0
+
+sendln 'dir flash:'
+waitregex '(MORE)|(More)' '^(([Ss]witch)|([rR]outer))[#>:]' ;sync triggers these immediately unless EOL is detected on prompts
+if result = 1 then
+	send ' '
+	waitregex '^(([Ss]witch)|([rR]outer))[#>:]$' ; Match any prompt
+endif
+timeout = timeout_tmp
+exit

@@ -1,0 +1,49 @@
+timeout = 60
+
+statusbox 'ROMMON wipe...' 'Status'
+
+; ROMMON SECTION 
+sendln 'flash_init'
+; TODO: Loop 
+
+wait #10'switch:'
+while result = 0
+ wait #10'switch:' ; Don't want to rely on a timeout, this will loop each timeout
+endwhile
+
+timeout = 1 ; drop timeout once flash has intialized
+sendln 'dir flash:'
+
+; ROMMON should always contain the same few important files for R/W systems.
+; TODO: confreg alternative:
+;	> additional checks for configs once in OS
+;	> confreg 0x2142 => boot => wipe flash => reboot => confreg 0x2102
+wait #10'switch:'
+sendln 'del flash:config.text'
+wait '(y/n)?'
+sendln 'y'
+
+wait #10'switch:'
+sendln 'del flash:private-config.text'
+wait '(y/n)?'
+sendln 'y'
+
+wait #10'switch:'
+sendln 'del flash:vlan.dat'
+wait '(y/n)?'
+sendln 'y'
+
+wait #10'switch:'
+sendln 'del flash:multiple-fs'
+wait '(y/n)?'
+sendln 'y'
+
+wait #10'switch:'
+sendln 'dir flash:'
+
+; Boot. Switch timeout and loop until wait succeeds
+wait #10'switch:'
+timeout = 60
+sendln 'boot'
+
+exit

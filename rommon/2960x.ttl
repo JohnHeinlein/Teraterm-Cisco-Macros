@@ -1,0 +1,17 @@
+timeout = 0
+
+setsync 1
+sendln 'flash_init'
+waitregex 'MORE' '^switch:\s$' 'already initialized\.$' ; Sync will match prompt for most recent command without EOL
+if result = 1 then
+	sendln ' '
+	wait #10'switch: '
+endif
+
+include 'rommon\files.ttl'
+
+setsync 0
+timeout = 0 ; Wait indefinitely for boot
+sendln 'boot'
+
+exit

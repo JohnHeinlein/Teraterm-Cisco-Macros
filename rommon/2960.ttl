@@ -1,0 +1,12 @@
+timeout = 0
+sendln 'flash_init'
+; TODO: Loop instead of timeout
+
+wait #10'switch:' ; wait until new prompt
+sendln 'dir flash:'
+
+include 'rommon\files.ttl'
+
+wait #10'switch:'
+sendln 'boot'
+exit

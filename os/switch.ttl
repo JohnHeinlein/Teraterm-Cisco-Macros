@@ -1,0 +1,94 @@
+; =========================
+; Initialization
+; =========================
+; Debug -----
+	; Initialize variables.
+	debug = 0
+	if debug = 1 then
+		statstr = 'foo'
+		gethostname hostname
+		dir_flash = '..\util\dir_flash.ttl'
+	else
+		dir_flash = 'util\dir_flash.ttl'
+	endif
+; ----- ----- -----
+
+; Verbosity -----
+	strconcat statstr #10'Booting SWITCH...'
+	statusbox statstr hostname
+; ----- ----- -----
+timeout = 0 ; Disable timeout
+
+; =========================
+; Wait for "Press RETURN" prompt
+; =========================
+wait 'Press RETURN'
+send #13 ;ASCII CR
+
+; Verbosity -----
+	strconcat stastr ' done!'
+	statusbox statstr hostname
+; ----- ----- -----
+
+; =========================
+; Decline setup prompts
+; =========================
+waitregex '\[yes\]' '\[yes/no\]' 'Switch>'; Some switches prompt for setup termination
+if result = 1 then
+	sendln 'yes'
+	wait '[yes/no]'
+	sendln 'no'
+elseif result = 2 then
+	sendln 'no'
+endif
+sendln 'en'
+
+
+; =========================
+; Wait for stdout to finish spamming after boot.
+; =========================
+; Verbosity -----
+	strconcat statstr #10'Waiting for std out to quiet down...'
+	statusbox statstr hostname
+; ----- ----- -----
+if debug = 1 then
+	timeout = 1 ; When debugging, there will be no std out
+else
+	timeout = 10
+endif
+
+do
+	recvln
+loop while result = 1
+
+strconcat statstr ' done!'
+statusbox statstr hostname
+
+; =========================
+; Parse flash for files
+; =========================
+include 'util\flash_parse.ttl'
+
+; =========================
+; Generate & execute delete commands
+; =========================
+include 'util\flash_wipe.ttl'
+
+; =========================
+; Wipe NVRAM again to prompt initial setup dialog
+; =========================
+include dir_flash
+sendln 'write erase'
+wait '[confirm]'
+send #13
+wait 'Initialized the geometry of nvram'
+pause 1
+
+call finish
+
+;; Exit upon completion
+:finish
+	messagebox 'Done!' hostname
+	clearscreen 1
+	exit
+return

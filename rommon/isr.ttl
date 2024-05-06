@@ -1,0 +1,4 @@
+sendln 'confreg 0x2142'
+waitln 'rommon'
+sendln 'reset'
+exit
