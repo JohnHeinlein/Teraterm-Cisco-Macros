@@ -9,4 +9,6 @@ Currently tested on:
   - Determined if "version" command is NOT FOUND.
 
 Incredibly WIP. Edge cases exist, and are everywhere, even for tested compatible models.
+
 For one, the scripts will fail if the flash contains more than 511 characters of combined file names.
+Additionally, I've probably severely abused/misused synchronization, and subsequently the recvln buffer. This language is as old as I am 
