@@ -1,0 +1,101 @@
+; .======================================
+; | Cisco flash wiping macro
+; |======================================
+; | - Parses output of 'dir flash:'
+; | - Adds non-critical files to string array
+; | - Loops through array and sends delete commands
+; | - TODO:
+; | 	- Somehow detect length of output and size array appropriately?
+; '--------------------------------------
+
+setsync 1
+sendln 'dir flash:'
+
+newstat = #10'Parsing files...'
+include stat
+
+; .======================================
+; | Logic variables
+; '--------------------------------------
+strdim files 50 ; String array of len 50
+filenum = 0
+delnum = 0
+savenum = 0
+
+timeout = 1
+do
+	recvln
+	got_line = result
+	
+	; Deal with 'more' prompt
+	; Doesn't trigger recvln since there's no EOL
+	if result = 0 then
+		send ' '
+		recvln
+		got_line = result
+	endif
+	
+	strmatch inputstr '\s{2}\S+$'
+	if result > 0 then ; If a file...
+		filename = matchstr
+		strremove filename 1 2 ; Trim leading whitespace (Needed for regex)
+		
+		; Verbosity
+		filenum = filenum + 1
+		
+		strmatch filename '((SE[0-9])|(E(X?)[0-9])|(\.bin)|(\.conf)|(\.lic)|(\.pkg)|(\.pack)$)'
+		if result > 0 then
+			savenum = savenum + 1
+		elseif result = 0 then
+			files[delnum] = filename
+			delnum = delnum + 1
+		endif
+		
+		if debug then
+		; messagebox 'foo' ''
+			int2str newstat filenum
+			strconcat newstat ': '
+			strconcat newstat filename
+			include stat
+		endif
+	endif
+loop while got_line
+
+; .======================================
+; | Print summary
+; '--------------------------------------
+int2str filenum_str filenum
+int2str delnum_str delnum
+int2str savenum_str savenum
+
+newstat = #10'Files found: '
+strconcat newstat filenum_str
+strconcat newstat #10#9'To delete: '
+strconcat newstat delnum_str
+strconcat newstat #10#9'To save: '
+strconcat newstat savenum_str
+if debug then
+	messagebox newstat 'debug'
+else
+	include stat
+endif
+
+; .======================================
+; | Delete files
+; '--------------------------------------
+if delnum < 1 then 
+	newstat = 'No files to delete!'
+	include stat
+	goto finish
+endif
+
+for i 0 49
+	delstr = 'del /r /f flash:'
+	strconcat delstr files[i]
+	sendln delstr
+next
+
+include dir_flash
+
+setsync 0
+exit
