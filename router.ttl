@@ -1,0 +1,78 @@
+; .======================================
+; | Cisco Router wiping macro
+; |======================================
+; | - Wait for boot
+; | - Wait for stdout to clear once the cmd loads (console spam)
+; | - Call subroutines to generate and execute wipe commands dynamically
+; | - Clear NVRAM to prompt initial setup dialog on next boot
+; | - Reboot to restore confreg in ROMMON
+; '--------------------------------------
+wait 'Router>' ;Don't think this ever gets split by stdout
+sendln 'enable'
+wait 'Router#'
+
+; Disable logging to console while we're working.
+; Too much of a pain to worry about std out being spammed
+sendln 'configure terminal'
+wait 'Router(config)#'
+sendln 'no logging console'
+
+; .======================================
+; | Wait for stdout to finish spamming after boot.
+; '--------------------------------------
+include 'util\stdout.ttl'
+
+; .======================================
+; | Wipe flash
+; '--------------------------------------
+include 'util\flash_wipe.ttl'
+
+; .======================================
+; | Wipe NVRAM
+; '--------------------------------------
+strconcat statstr #10'Clearing NVRAM...'
+statusbox statstr hostname
+
+wait 'Switch#'
+sendln 'write erase'
+wait '[confirm]'
+send #13
+wait 'Initialized the geometry of nvram'
+pause 1
+
+strconcat statstr ' done!'
+statusbox statstr hostname
+
+; .======================================
+; | Re-enable console logging
+; '--------------------------------------
+wait 'Router#'
+sendln 'configure terminal'
+wait 'Router(config)#'
+sendln 'logging console 5'
+wait 'Router(config)#'
+sendln 'exit'
+
+; .======================================
+; | Reboot and disable confreg
+; '--------------------------------------
+if debug = 1 then
+	exit ; Don't reboot
+endif
+
+newstat = #10'Rebooting to reset confreg..'
+include stat
+
+sendln 'reload'
+wait '[confirm]'
+send #13
+
+timeout = 0
+wait '#####' ;Boot spams octothorpes; just capture a few
+sendbreak ; Re-enter ROMMON
+;pause 1
+sendbreak ; Second break just because it might be a little spicy
+wait 'rommon'
+sendln 'confreg 0x2102'
+
+exit
