@@ -7,7 +7,7 @@ setsync 1
 ;include 'util\dir_flash.ttl' ; List flash contents
 
 ;pause 5
-wait #10'switch:'
+;wait #10'switch:'
 sendln 'del flash:config.text'
 wait '(y/n)?'
 sendln 'y'

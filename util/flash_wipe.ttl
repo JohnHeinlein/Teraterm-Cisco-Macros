@@ -8,6 +8,11 @@
 ; | 	- Somehow detect length of output and size array appropriately?
 ; '--------------------------------------
 
+; Cache globals
+old_timeout = timeout
+
+if debug include 'test\mkdir.ttl'
+
 setsync 1
 sendln 'dir flash:'
 
@@ -22,6 +27,9 @@ filenum = 0
 delnum = 0
 savenum = 0
 
+; .======================================
+; | Parse Flash
+; '--------------------------------------
 timeout = 1
 do
 	recvln
@@ -30,6 +38,10 @@ do
 	; Deal with 'more' prompt
 	; Doesn't trigger recvln since there's no EOL
 	if result = 0 then
+		if debug then
+			newstat = '[DEBUG] hit more prompt?'
+			include stat
+		endif
 		send ' '
 		recvln
 		got_line = result
@@ -53,10 +65,10 @@ do
 		
 		if debug then
 		; messagebox 'foo' ''
-			int2str newstat filenum
-			strconcat newstat ': '
-			strconcat newstat filename
-			include stat
+			;int2str newstat filenum
+			;strconcat newstat ': '
+			;strconcat newstat filename
+			;include stat
 		endif
 	endif
 loop while got_line
@@ -74,11 +86,11 @@ strconcat newstat #10#9'To delete: '
 strconcat newstat delnum_str
 strconcat newstat #10#9'To save: '
 strconcat newstat savenum_str
-if debug then
-	messagebox newstat 'debug'
-else
+;if debug then
+;	messagebox newstat 'debug'
+;else
 	include stat
-endif
+;endif
 
 ; .======================================
 ; | Delete files
@@ -86,16 +98,45 @@ endif
 if delnum < 1 then 
 	newstat = 'No files to delete!'
 	include stat
-	goto finish
+	exit
 endif
 
-for i 0 49
+for i 0 (delnum - 1)
 	delstr = 'del /r /f flash:'
-	strconcat delstr files[i]
-	sendln delstr
+	;ifdefined files[i]
+	;if result != 0 then
+	;	strconcat delstr files[i]
+	;	sendln delstr
+	;endif
+	
+	;debug
+	if debug then
+		int2str i_str i
+		tmp = 'To delete ('
+		strconcat tmp i_str
+		strconcat tmp '/'
+		strconcat tmp delnum_str
+		strconcat tmp ')'
+		messagebox files[i] tmp
+	
+	
+	strcompare files[i] ''
+	if result != 0 then
+		strconcat delstr files[i]
+		sendln delstr
+	endif
 next
 
 include dir_flash
 
+if debug then
+	newstat = '[DEBUG] End of flash_wipe.ttl'
+	include stat
+endif
+
 setsync 0
+
+; Restore globals
+timeout = old_timeout
+
 exit

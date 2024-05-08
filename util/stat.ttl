@@ -13,8 +13,6 @@
 ifdefined statstr
 if result = 0 statstr = ''
 
-;ifdefined hostname
-;if result = 0 gethostname hostname
 gethostname hostname
 
 ifdefined newstat
@@ -33,19 +31,39 @@ if result tmp_groupmatchstr2 = groupmatchstr2
 ; .======================================
 ; | Remove as many lines from the top as necessary
 ; '--------------------------------------
-do
-	strlen statstr
-	len_stat = result
+strlen statstr
+len_stat = result
 
-	strlen newstat
-	len_newstat = result
+strlen newstat
+len_newstat = result
+while (len_stat + len_newstat) > 510
 
 	; Split by newlines, store into 2 variables
 	; (Pop off topmost line)
 	strsplit statstr #10 2
 	
+	; Everything but the first line
 	statstr = groupmatchstr2
-loop while (len_stat + len_newstat) > 510 ;511 max len, keep space for newline
+	strlen statstr
+	len_stat = result
+	
+	;debug
+	int2str len_stat_str len_stat
+	int2str len_newstat_str len_newstat
+	int2str total_len_str (len_stat + len_newstat)
+	
+	if debug then
+		tmp = 'Statstr length: '
+		strconcat tmp len_stat_str
+		strconcat tmp #10'Newstat length: '
+		strconcat tmp len_newstat_str
+		strconcat tmp #10'Total: '
+		strconcat tmp total_len_str
+		messagebox tmp 'DEBUG: Stat'
+	endif
+	;/debug
+	
+loop ;while (len_stat + len_newstat) > 510 ;511 max len, keep space for newline
 
 ; Append newstat to current stat body and display
 strconcat statstr #10

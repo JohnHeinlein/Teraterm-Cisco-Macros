@@ -1,87 +1,75 @@
-;======================================
-; Driver for all macro files
-;======================================
-; Determines the type of device being run, and
-;	calls appropriate subroutines
-;--------------------------------------
+; .======================================
+; | Driver for all macro files
+; |--------------------------------------
+; | Determines the type of device being run, and
+; |	calls appropriate subroutines
+; '--------------------------------------
 
 ; Aliases for subrouines
 dir_flash = 'util\dir_flash.ttl'
 stat = 'util\stat.ttl'
 
-;======================================
-; Debugging
-; Running files directly messes up the relative paths,
-; 	so I run it from here instead of having a bunch
-;	of repeated debugging code
-;--------------------------------------
-debug = 1
+; .======================================
+; | Debugging
+; |--------------------------------------
+; | Running files directly messes up the relative paths,
+; |	so I run it from here instead of having a bunch
+; |	of repeated debugging code
+; '--------------------------------------
+debug = 0
 if debug then
 	statstr = ''
 	gethostname hostname
 	strconcat hostname ' [DEBUG]'
 	statusbox statstr hostname
 	
-	include 'util\flash_parse_arr.ttl'
-	exit ; Don't bother with the rest
+	include 'os\cat3k.ttl'
+	; Call subroutines here
 endif
 
 
-;======================================
-; init
-;--------------------------------------
+; .======================================
+; | init
+; '--------------------------------------
 statstr = ''
 gethostname hostname
 statusbox statstr hostname
 
-
+; .======================================
+; | DIY Switch statement
+; |--------------------------------------
+; | Once in ROMMON, we use some heuristic to determine the model of switch.
+; | Not trivial, since different switches can have dramatically different 
+; | bootloaders and rom monitors
+; '--------------------------------------
 setsync 1
 sendln 'version'
 recvln ; First captures the command i just sent? lol
 recvln
 setsync 0
 if result = 1 then
-	; WS-C2960X
-	; TODO: Unify C2960 model
-	strmatch inputstr '^C2960X\s'
+	; Catalyst 2960 Series Switches
+	strmatch inputstr '^C2960.?\s'	
 	if result = 1 then
-		strconcat statstr '**C2960X ROMMON Detected**'
-		statusbox statstr hostname
-		include 'rommon\2960x.ttl'
+		newstat = '**C2960 ROMMON Detected**'
+		include stat
+		include 'rommon\2960.ttl'
 		include 'os\switch.ttl'
 		goto finish
 	endif
 	
-	; WS-C2960
-	strmatch inputstr '^C2960\s'
-	if result = 1 then
-		strconcat statstr '**2960 ROMMON Detected**'
-		statusbox statstr hostname
-		include 'rommon\2960x.ttl' ; No difference found so far
-		include 'os\switch.ttl'
-		goto finish
-	endif
-	
-	; WS-C2960S
-	strmatch inputstr '^C2960S\s'
-	if result = 1 then
-		strconcat statstr '**2960S ROMMON Detected**'
-		statusbox statstr hostname
-		include 'rommon\2960x.ttl' ; No difference found so far
-		include 'os\switch.ttl'
-		goto finish
-	endif
-	
+	; Catalyst 3000 Series Switches
 	strmatch inputstr '^CAT3K_CAA\s'
 	if result = 1 then
-		strconcat statstr '**C3K ROMMON Detected**'
-		statusbox statstr hostname
+		newstat = '**C3K ROMMON Detected**'
+		include stat
 		include 'rommon\cat3k.ttl'
 		include 'os\cat3k.ttl'
 		goto finish
 	endif
 	
-	; If version fails, it should be a router
+	; If version fails, it should be a router.
+	; DEFINITELY subject to change, pending more strange devices.
 	strmatch inputstr 'command \"version\" not found'
 	if result > 0 then
 		setsync 1
@@ -91,8 +79,8 @@ if result = 1 then
 		
 		strmatch inputstr 'rommon [0-9]+'
 		if result = 1 then
-			strconcat statstr '"version" command invalid, Router assumed'
-			statusbox statstr hostname
+			newstat = '"version" command invalid, Router assumed'
+			include stat
 			include 'rommon\isr.ttl'
 			include 'os\router.ttl'
 			goto finish
@@ -102,11 +90,15 @@ if result = 1 then
 	goto no_match
 endif
 
-:no_match
-messagebox 'No supported device detected, exiting' 'Err'
-exit
 
 :finish
-;clearscreen 1
-messagebox 'Done!' hostname
+clearscreen 1
+gethostname hostname
+endMessage = hostname
+strconcat endMessage ' finished!'
+messagebox endMessage hostname
+exit
+
+:no_match
+messagebox 'No supported device detected, exiting' 'Err'
 exit

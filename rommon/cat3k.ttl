@@ -32,4 +32,6 @@ loop while result != 1
 	statusbox statstr hostname
 ; ----- ----- -----
 
+send #13
+
 exit

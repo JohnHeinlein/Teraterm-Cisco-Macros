@@ -7,7 +7,9 @@
 ; | - Clear NVRAM to prompt initial setup dialog on next boot
 ; | - Reboot to restore confreg in ROMMON
 ; '--------------------------------------
-wait 'Router>' ;Don't think this ever gets split by stdout
+
+
+wait 'Router>'
 sendln 'enable'
 wait 'Router#'
 
@@ -16,29 +18,27 @@ wait 'Router#'
 sendln 'configure terminal'
 wait 'Router(config)#'
 sendln 'no logging console'
+wait 'Router(config)#'
+sendln 'exit'
 
 ; .======================================
 ; | Wait for stdout to finish spamming after boot.
 ; '--------------------------------------
-include 'util\stdout.ttl'
+; Might not be necessary anymore, since we disable console logging above
+;include 'util\stdout.ttl'
 
 ; .======================================
-; | Parse flash for files
-; '--------------------------------------
-include 'util\flash_parse.ttl'
-
-; .======================================
-; | Generate & execute delete commands
+; | Wipe flash
 ; '--------------------------------------
 include 'util\flash_wipe.ttl'
 
 ; .======================================
 ; | Wipe NVRAM
 ; '--------------------------------------
-strconcat statstr #10'Clearing NVRAM...'
-statusbox statstr hostname
+newstat = #10'Clearing NVRAM...'
+include stat
 
-wait 'Switch#'
+wait 'Router#'
 sendln 'write erase'
 wait '[confirm]'
 send #13
@@ -61,15 +61,20 @@ sendln 'exit'
 ; .======================================
 ; | Reboot and disable confreg
 ; '--------------------------------------
-if debug = 1 then
-	exit ; Don't reboot
-endif
+;if debug = 1 then
+;	messagebox 'Debug exit' 'DEBUG'
+;	exit ; Don't reboot
+;endif
 
 newstat = #10'Rebooting to reset confreg..'
 include stat
 
 sendln 'reload'
-wait '[confirm]'
+waitregex '[confirm]' '[yes/no]'
+if result = 2 then
+	sendln 'no'
+	wait '[confirm]'
+endif
 send #13
 
 timeout = 0

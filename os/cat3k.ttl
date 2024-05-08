@@ -1,7 +1,7 @@
 ; .======================================
 ; | Catalyst 3000 Series Wiping Macro
 ; |======================================
-; | Some unique shenanigans, since ROMMON is weirdd
+; | Some unique shenanigans, since ROMMON is weird
 ; '--------------------------------------
 
 ; .======================================
@@ -15,18 +15,17 @@ sendln 'en'
 ; .======================================
 ; | Parse & wipe flash
 ; '--------------------------------------
-include 'util\flash_parse.ttl'
 include 'util\flash_wipe.ttl'
-include 'util\dir_flash.ttl'
 
 ; .======================================
 ; | Wipe NVRAM & reboot
 ; '--------------------------------------
 newstat = #10'Clearing NVRAM...'
-include 'util\stat.ttl'
-;strconcat statstr #10'Clearing NVRAM...'
-;statusbox statstr hostname
+include stat
 
+setsync 1
+timeout = 0
+wait 'Switch#'
 sendln 'write erase'
 wait '[confirm]'
 send #13
@@ -34,25 +33,19 @@ send #13
 ; .======================================
 ; | Reset config register from within IOS
 ; '--------------------------------------
-;sendln 'configure terminal'
-;waitln 'Switch(config)#'
-;sendln 'config-register 0x2142'
-;waitln 'Switch(config)#'
-;sendln 'exit'
 
-setsync 1
 wait 'Switch#'
 sendln 'reload'
-waitregex '[yes/no]' '[confirm]'
+waitregex '\[yes/no\]' '\[confirm\]'
 if result = 1 then
 	sendln 'no'
-	sendln 'reload'
 	wait '[confirm]'
 endif
 send #13
-setsync 0
 
 wait 'Interrupt the system within 5 seconds'
+sendbreak
+pause 1
 sendbreak
 wait 'switch:'
 	sendln 'set SWITCH_IGNORE_STARTUP_CFG 0'
