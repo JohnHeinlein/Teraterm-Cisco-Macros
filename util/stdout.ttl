@@ -1,0 +1,21 @@
+newstat = #10'Waiting for std out to quiet down...'
+include 'util/stat.ttl'
+
+timeout_old = timeout
+
+if debug = 1 then
+	timeout = 1 ; When debugging, there will be no std out
+else
+	timeout = 10
+endif
+
+do
+	recvln
+loop while result = 1
+
+newstat = ' done!'
+include 'util/stat.ttl'
+
+timeout = timeout_old
+
+exit

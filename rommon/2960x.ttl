@@ -1,17 +1,41 @@
+; =========================
+; C2960 Rommon Wipe
+; =========================
+; - 2960 units are not write-protected
+; - Wipe a set of common files, including configs
+; - Boot and clear remainder dynamically
+;--------------------------------------
 timeout = 0
-
 setsync 1
+
+; Init flash
 sendln 'flash_init'
 waitregex 'MORE' '^switch:\s$' 'already initialized\.$' ; Sync will match prompt for most recent command without EOL
 if result = 1 then
-	sendln ' '
-	wait #10'switch: '
+	send ' '
+	pause 1
+	send ' ' ; Seems to skip sometimes.+
 endif
 
+; Wipe common files
 include 'rommon\files.ttl'
 
-setsync 0
-timeout = 0 ; Wait indefinitely for boot
 sendln 'boot'
+
+; Verbosity -----
+	strconcat statstr #10'Booting SWITCH...'
+	statusbox statstr hostname
+; ----- ----- -----
+
+; =========================
+; Wait for "Press RETURN" prompt
+; =========================
+wait 'Press RETURN'
+send #13 ;ASCII CR
+
+; Verbosity -----
+	strconcat stastr ' done!'
+	statusbox statstr hostname
+; ----- ----- -----
 
 exit

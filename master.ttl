@@ -1,9 +1,39 @@
-;=========================
-; 
-;=========================
+;======================================
+; Driver for all macro files
+;======================================
+; Determines the type of device being run, and
+;	calls appropriate subroutines
+;--------------------------------------
+
+; Aliases for subrouines
+dir_flash = 'util\dir_flash.ttl'
+stat = 'util\stat.ttl'
+
+;======================================
+; Debugging
+; Running files directly messes up the relative paths,
+; 	so I run it from here instead of having a bunch
+;	of repeated debugging code
+;--------------------------------------
+debug = 1
+if debug then
+	statstr = ''
+	gethostname hostname
+	strconcat hostname ' [DEBUG]'
+	statusbox statstr hostname
+	
+	include 'util\flash_parse_arr.ttl'
+	exit ; Don't bother with the rest
+endif
+
+
+;======================================
+; init
+;--------------------------------------
 statstr = ''
 gethostname hostname
 statusbox statstr hostname
+
 
 setsync 1
 sendln 'version'
@@ -12,12 +42,14 @@ recvln
 setsync 0
 if result = 1 then
 	; WS-C2960X
+	; TODO: Unify C2960 model
 	strmatch inputstr '^C2960X\s'
 	if result = 1 then
 		strconcat statstr '**C2960X ROMMON Detected**'
 		statusbox statstr hostname
 		include 'rommon\2960x.ttl'
-		goto boot_switch
+		include 'os\switch.ttl'
+		goto finish
 	endif
 	
 	; WS-C2960
@@ -26,15 +58,27 @@ if result = 1 then
 		strconcat statstr '**2960 ROMMON Detected**'
 		statusbox statstr hostname
 		include 'rommon\2960x.ttl' ; No difference found so far
-		goto boot_switch
+		include 'os\switch.ttl'
+		goto finish
 	endif
 	
+	; WS-C2960S
 	strmatch inputstr '^C2960S\s'
 	if result = 1 then
 		strconcat statstr '**2960S ROMMON Detected**'
 		statusbox statstr hostname
 		include 'rommon\2960x.ttl' ; No difference found so far
-		goto boot_switch
+		include 'os\switch.ttl'
+		goto finish
+	endif
+	
+	strmatch inputstr '^CAT3K_CAA\s'
+	if result = 1 then
+		strconcat statstr '**C3K ROMMON Detected**'
+		statusbox statstr hostname
+		include 'rommon\cat3k.ttl'
+		include 'os\cat3k.ttl'
+		goto finish
 	endif
 	
 	; If version fails, it should be a router
@@ -50,22 +94,19 @@ if result = 1 then
 			strconcat statstr '"version" command invalid, Router assumed'
 			statusbox statstr hostname
 			include 'rommon\isr.ttl'
-			goto boot_router
+			include 'os\router.ttl'
+			goto finish
 		endif
 
 	endif
-	
 	goto no_match
 endif
 
-:boot_switch ;Re-entry point after ROMMON
-include 'os\switch.ttl' ;Waits for RETURN prompt
-exit
-
-:boot_router
-include 'os\router.ttl'
-exit
-
 :no_match
 messagebox 'No supported device detected, exiting' 'Err'
+exit
+
+:finish
+;clearscreen 1
+messagebox 'Done!' hostname
 exit

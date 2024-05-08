@@ -1,41 +1,38 @@
-; ===== ===== ===== ===== =====
-; Subroutine for printing to status box
-; Automatically scrolls if we exceed string length
-; Called as:
-;	newstat = 'new status line'
-;	include 'util\stat.ttl'
-; ===== ===== ===== ===== =====
-
-debug = 0
-if debug = 1 newstat = 'FOOBAR'
+; .======================================
+; | Subroutine for printing to status box
+; |======================================
+; | Scrolls if we exceed string length
+; | Called as:
+; |   newstat = 'new status line'
+; |   include 'util\stat.ttl'
+; | - 'newstat' is cleared after each call
+; | - 'statstr' retains content for use elsewhere
+; '--------------------------------------
 
 ; init
 ifdefined statstr
 if result = 0 statstr = ''
 
-ifdefined hostname
-if result = 0 gethostname hostname
+;ifdefined hostname
+;if result = 0 gethostname hostname
+gethostname hostname
 
 ifdefined newstat
 if result = 0 messagebox 'ERR: newstat undefined!' 'ERR'
-;/init
+; /init
 
-; Cache global vars so we don't have side effects
-tmp_result = result
-tmp_groupmatchstr1 = groupmatchstr1
-tmp_groupmatchstr2 = groupmatchstr2
-; /cache
+; .======================================
+; | Cache global variables
+; '--------------------------------------
+ifdefined groupmatchstr1
+if result tmp_groupmatchstr1 = groupmatchstr1
 
-tmpcnt = 50
-while tmpcnt > 0
-	int2str tmpcnt_str tmpcnt
-	strconcat statstr tmpcnt_str
-	strconcat statstr '_foobar_fizzbuzz'#10
-	tmpcnt = tmpcnt - 1
-endwhile
-messagebox statstr 'debug'
-; /debug
+ifdefined groupmatchstr2 
+if result tmp_groupmatchstr2 = groupmatchstr2
 
+; .======================================
+; | Remove as many lines from the top as necessary
+; '--------------------------------------
 do
 	strlen statstr
 	len_stat = result
@@ -43,23 +40,29 @@ do
 	strlen newstat
 	len_newstat = result
 
+	; Split by newlines, store into 2 variables
+	; (Pop off topmost line)
 	strsplit statstr #10 2
-	
-	if debug = 1 messagebox groupmatchstr1 'First match'
-	if debug = 1 messagebox groupmatchstr2 'Second match'
 	
 	statstr = groupmatchstr2
 loop while (len_stat + len_newstat) > 510 ;511 max len, keep space for newline
 
-
+; Append newstat to current stat body and display
 strconcat statstr #10
 strconcat statstr newstat
 strlen statstr
-if debug = 1 messagebox statstr result
-
+int2str charcount result
+strconcat hostname ' ['
+strconcat hostname charcount
+strconcat hostname '/511]'
 statusbox statstr hostname
 
 ; Restore global variables
-result = tmp_result
-groupmatchstr1 = tmp_groupmatchstr1_tmp
-groupmatchstr2 = tmp_groupmatchstr2
+ifdefined tmp_groupmatchstr1
+if result groupmatchstr1 = tmp_groupmatchstr1
+
+ifdefined tmp_groupmatchstr2
+if result groupmatchstr2 = tmp_groupmatchstr2
+
+newstat = ''
+exit

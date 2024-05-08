@@ -1,0 +1,118 @@
+; ===== ===== ===== ===== =====
+; Subroutine to wipe files
+; Asumed globals:
+;	statstr
+; Used in models:
+;	ISR4331
+;	C2960 / C2960X
+; ===== ===== ===== ===== =====
+
+setsync 1
+;include 'util\dir_flash.ttl'
+sendln 'dir flash:'
+
+strconcat statstr #10'Parsing files...'
+statusbox statstr "Status"
+
+; Verbosity & variables
+	filevar = '' ; Store all filenames to be deleted
+	filenum = 0 ; Total files
+	savenum  = 0 ; Files to be saved
+	delnum = 0 ; Files to delete
+	strFiles = #10'Files found: '
+	strDel = #10#9'To delete: '
+	strSave = #10#9'To save: '
+	statstrtmp = ''
+;
+
+timeout = 1 ; To detect when output finishes
+do
+	recvln
+	got_line = result
+	
+	; 'More' prompt doesn't have an EOL,
+	; so we need to throw space at a timeout and try again
+	if result = 0 then
+		send ' '
+		recvln
+		
+		if debug = 1 messagebox inputstr 'debug'
+		
+		if result = 0 then
+			break
+		else
+			got_line = result
+		endif
+	endif
+	;
+	
+	; Verbosity -----
+		delnumstr = ''
+		strDelTmp = strDel
+		
+		savenumstr = ''
+		strSaveTmp = strSave
+		
+		filenumstr = ''
+		strFilesTmp = strFiles
+		
+		statstrtmp = statstr
+	; ----- ----- -----
+
+	strmatch inputstr '\s{2}\S+$' ; Need to match leading spaces; no lookarounds
+	if result > 0 then ; If filename matches...
+		filename = matchstr
+		strremove filename 1 2 ; Trim leading whitespace we needed in REGEX
+	
+		; Verbosity -----
+			filenum = filenum + 1
+		; ----- ----- -----
+	
+		strmatch filename '((SE[0-9])|(E(X?)[0-9])|(\.bin)|(\.conf)|(\.lic)|(\.pkg)|(\.pack)$)'
+		if result > 0 then ; If critical file
+			; Verbosity -----
+				savenum = savenum + 1
+			; ----- ----- -----
+		elseif result = 0 then ; If non-critical
+			strconcat filevar filename
+			strconcat filevar #13
+			
+			; Verbosity -----
+				delnum = delnum + 1
+			; ----- ----- -----
+		endif
+		; Debugging -----
+		if debug = 1 then
+			strconcat statstr filename
+			int2str filenum_str filenum
+			strconcat statstr filenum_str
+			statusbox statstr "Status"
+		endif
+		; ----- ----- -----
+		
+	endif
+	; Verbosity -----
+		int2str filenumstr filenum
+		strFilesTmp = strFiles
+		strconcat strFilesTmp filenumstr
+		strconcat statstrtmp strFilesTmp
+		
+		int2str delnumstr delnum
+		strDelTmp = strDel
+		strconcat strDelTmp delnumstr
+		strconcat statstrtmp strDelTmp
+		
+		int2str savenumstr savenum
+		strSaveTmp = strSave
+		strconcat strSaveTmp savenumstr
+		strconcat statstrtmp strSaveTmp
+		
+		statusbox statstrtmp hostname
+	; ----- ----- -----
+loop while got_line = 1
+setsync 0
+
+if debug = 1 messagebox filevar 'debug'
+
+statstr = statstrtmp ; Keep final counts
+statusbox statstr hostname

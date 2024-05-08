@@ -3,8 +3,6 @@
 strconcat statstr #10'Wiping standard switch files...'
 statusbox statstr hostname
 
-timeout = 0 ; drop timeout once flash has intialized
-
 setsync 1
 ;include 'util\dir_flash.ttl' ; List flash contents
 

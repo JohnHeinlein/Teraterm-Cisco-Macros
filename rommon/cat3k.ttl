@@ -1,0 +1,35 @@
+; =========================
+; Catalyst 3000 Series ROMMON Wipe
+; =========================
+; 
+;--------------------------------------
+
+; Bypass configs
+sendln 'set SWITCH_IGNORE_STARTUP_CFG 1'
+sendln 'set ENABLE_BREAK yes'
+waitln 'switch: '
+
+; Verbosity -----
+	strconcat statstr #10'Booting SWITCH...'
+	statusbox statstr hostname
+; ----- ----- -----
+
+; =========================
+; Boot & wait for "Press RETURN" prompt
+; =========================
+sendln 'reset'
+wait '(y/n)'
+sendln 'y'
+
+timeout = 0
+do ; Wait for boot, but catch special prompt
+	waitregex 'Press RETURN' 'not configured to boot automatically'
+	if result = 2 sendln 'boot'
+loop while result != 1
+
+; Verbosity -----
+	strconcat stastr ' done!'
+	statusbox statstr hostname
+; ----- ----- -----
+
+exit
