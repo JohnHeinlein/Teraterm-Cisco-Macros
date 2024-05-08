@@ -8,14 +8,21 @@ ultimately require physical access. Some models, e.g. CAT3K/ISR units, will requ
 
 Additionally, these macros currently only wipe files from flash. The modular design makes it easy to add additional commands between the wipe and reboot, and can thus be extended to perform a more deep clean on e.g. license infomation.
 
-Currently tested on:
-- 2960 series (C2960, C2960S, C2960X) switches
-  - Determined by "version" command in ROMMON
+# Tested compatible
+- 2960 series switches
+  - C2960
+  - C2960S
+  - C2960X
 - Catalyst 3000 series (CAT3K) Switches
-  - Determined by "version" command in ROMMON
-- ISR4331
-  - Determined if "version" command is NOT FOUND.
+  - 3650
+- Integrated Service Routers
+  - ISR4331
 
 Incredibly WIP. Edge cases exist, and are everywhere, even for supported models.
 
 Additionally, I've probably severely abused/misused language features, as TTL is almost as old as I am and has barely changed the entire time.
+
+# To do
+- ISR
+  - Record serial number to check against [FN64253](https://www.cisco.com/c/en/us/support/docs/field-notices/642/fn64253.html)
+  - Check must be performed manually. In theory a helper program could grab the login cookie and check cisco's API, but that ain't me.
