@@ -6,7 +6,12 @@ Once in the ROMMON/bootloader, master.ttl will attempt to detect the type of dev
 These macros DO NOT do the initial break into rommon, as this varies dramatically depending on previous configurations, models, and may 
 ultimately require physical access. Some models, e.g. CAT3K/ISR units, will require a second entry into rommon to restore confreg/boot vars. These subsequent reboots ARE handled automatically, as more assumptions can be made once the model is known.
 
-Additionally, these macros currently only wipe files from flash. The modular design makes it easy to add additional commands between the wipe and reboot, and can thus be extended to perform a more deep clean on e.g. license infomation.
+Incredibly WIP. Edge cases exist, and are everywhere, even for supported models.
+
+Additionally, I've probably severely abused/misused language features, as TTL is almost as old as I am and has barely changed the entire time.
+
+> [!NOTE]
+> Currently only wipes files from flash. May be extended for license info, etc, in the future
 
 # Tested compatible
 - 2960 series switches
@@ -17,10 +22,6 @@ Additionally, these macros currently only wipe files from flash. The modular des
   - 3650
 - Integrated Service Routers
   - ISR4331
-
-Incredibly WIP. Edge cases exist, and are everywhere, even for supported models.
-
-Additionally, I've probably severely abused/misused language features, as TTL is almost as old as I am and has barely changed the entire time.
 
 # To do
 - ISR
