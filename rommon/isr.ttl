@@ -1,28 +1,39 @@
-; =====================================
-; 4000 Series Integrated Series Router ROMMON Wipe
-; =====================================
-; - Set confreg to ignore configs
-; - Reboot to wipe dynamically
-;--------------------------------------
+; .=====================================
+; | 4000 Series Integrated Series Router ROMMON Wipe
+; | =====================================
+; | - Set confreg to ignore configs
+; | - Reboot to wipe dynamically
+; '--------------------------------------
+
+if debug then
+	newstat = #10'[DEBUG] Entering isr.ttl'
+	include stat
+endif
+
 sendln 'confreg 0x2142'
-waitln 'rommon'
+wait 'rommon'
 sendln 'reset'
 
 ; Verbosity -----
-	strconcat statstr #10'Booting ROUTER...'
-	statusbox statstr hostname
+	newstat =  #10'Booting ROUTER...'
+	include stat
 ; ----- ----- -----
 
-;======================================
-; Wait for "Press RETURN" prompt
-;--------------------------------------
+; .======================================
+; | Wait for "Press RETURN" prompt
+; '--------------------------------------
 timeout = 0
 wait 'Press RETURN'
 send #13 ;ASCII CR
 
 ; Verbosity -----
-	strconcat stastr ' done!'
-	statusbox statstr hostname
+	newstat =  ' done!'
+	include stat
 ; ----- ----- -----
+
+if debug then
+	newstat = #10'[DEBUG] Exiting isr.ttl'
+	include stat
+endif
 
 exit

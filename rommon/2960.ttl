@@ -5,6 +5,10 @@
 ; - Wipe a set of common files, including configs
 ; - Boot and clear remainder dynamically
 ;--------------------------------------
+
+newstat = #10'Entering 2960.ttl'
+include db
+
 timeout = 0
 setsync 1
 
@@ -22,18 +26,19 @@ do
 	if result = 1 send ' '
 loop while result = 1
 
-; Wipe common files
+; .=========================
+; | Wipe common files
+; '=========================
 include 'rommon\files.ttl'
 
-; Boot
+; .=========================
+; | Boot & wait for prompt
+; '=========================
 sendln 'boot'
 
 newstat = #10'Booting SWITCH...'
 include stat
 
-; .=========================
-; | Wait for "Press RETURN" prompt
-; '=========================
 wait 'Press RETURN'
 send #13 ;ASCII CR
 

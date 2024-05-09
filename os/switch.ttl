@@ -1,12 +1,16 @@
 ; .======================================
-; | Initialization
+; | Switch wiping macro
 ; |======================================
-; |
+; | Currently only tested on 3650 and 2960 series.
 ; '--------------------------------------
+
+newstat = 'Entered switch.ttl'
+include db
 
 ; .======================================
 ; | Decline setup prompts
 ; '--------------------------------------
+
 waitregex '\[yes\]' '\[yes/no\]' 'Switch>'; Some switches prompt for setup termination
 if result = 1 then
 	sendln 'yes'
@@ -31,10 +35,17 @@ include 'util\flash_wipe.ttl'
 ; | Wipe NVRAM again to prompt initial setup dialog
 ; '--------------------------------------
 include dir_flash
+
+newstat = #10'Wiping NVRAM...'
+include db
+
 sendln 'write erase'
 wait '[confirm]'
 send #13
 wait 'Initialized the geometry of nvram'
 pause 1
+
+newstat = ' done!'
+include db
 
 exit

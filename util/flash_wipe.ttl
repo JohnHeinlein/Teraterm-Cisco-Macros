@@ -11,26 +11,29 @@
 ; Cache globals
 old_timeout = timeout
 
-if debug include 'test\mkdir.ttl'
+if debug then
+	newstat = #10'[DEBUG] Creating fake dirs...'
+	include stat
+	include 'test\mkdir.ttl'
+	newstat =  ' done!'
+	include stat
+endif
 
 setsync 1
 sendln 'dir flash:'
 
-newstat = #10'Parsing files...'
-include stat
-
-; .======================================
-; | Logic variables
-; '--------------------------------------
-strdim files 50 ; String array of len 50
-filenum = 0
-delnum = 0
-savenum = 0
-
 ; .======================================
 ; | Parse Flash
 ; '--------------------------------------
+newstat = #10'Parsing files...'
+include stat
+
+strdim files 200  ; String array of len 50
+filenum = 0
+delnum = 0
+savenum = 0
 timeout = 1
+
 do
 	recvln
 	got_line = result
@@ -39,7 +42,7 @@ do
 	; Doesn't trigger recvln since there's no EOL
 	if result = 0 then
 		if debug then
-			newstat = '[DEBUG] hit more prompt?'
+			newstat = #10'[DEBUG] End/More, sending space'
 			include stat
 		endif
 		send ' '
@@ -73,6 +76,10 @@ do
 	endif
 loop while got_line
 
+timeout = 0
+newstat = ' done!'
+include stat
+
 ; .======================================
 ; | Print summary
 ; '--------------------------------------
@@ -86,20 +93,23 @@ strconcat newstat #10#9'To delete: '
 strconcat newstat delnum_str
 strconcat newstat #10#9'To save: '
 strconcat newstat savenum_str
-;if debug then
-;	messagebox newstat 'debug'
-;else
-	include stat
-;endif
+include stat
 
 ; .======================================
 ; | Delete files
 ; '--------------------------------------
+
+newstat = #10'Delnum check'
+include db
+
 if delnum < 1 then 
-	newstat = 'No files to delete!'
+	newstat = #10'No files to delete!'
 	include stat
 	exit
 endif
+
+newstat = #10'Deleting files...'
+include stat
 
 for i 0 (delnum - 1)
 	delstr = 'del /r /f flash:'
@@ -109,30 +119,36 @@ for i 0 (delnum - 1)
 	;	sendln delstr
 	;endif
 	
-	;debug
-	if debug then
-		int2str i_str i
-		tmp = 'To delete ('
+	; dynamically update deletion progress
+	;if debug then ; might add to non-debug mode too
+		statstr_tmp = statstr
+		
+		int2str i_str (i + 1)
+		tmp = ' ('
 		strconcat tmp i_str
 		strconcat tmp '/'
 		strconcat tmp delnum_str
-		strconcat tmp ')'
-		messagebox files[i] tmp
+		strconcat tmp ') '
+		if debug strconcat tmp files[i]
+		strconcat statstr tmp
+		statusbox statstr hostname
+		
+		statstr = statstr_tmp
+	;endif
+	strconcat delstr files[i]
+	sendln delstr
 	
-	
-	strcompare files[i] ''
-	if result != 0 then
-		strconcat delstr files[i]
-		sendln delstr
-	endif
+	; Doesn't seem to like the spam of not waiting, sometimes crashes and returns to master.ttl
+	waitregex '^(([Ss]witch)|([rR]outer))[#>:]'
+	;wait 'Router#'
 next
 
-include dir_flash
+newstat = ' done!'
+include stat
 
-if debug then
-	newstat = '[DEBUG] End of flash_wipe.ttl'
-	include stat
-endif
+if debug include dir_flash
+newstat = #10'End of flash_wipe.ttl'
+include db
 
 setsync 0
 

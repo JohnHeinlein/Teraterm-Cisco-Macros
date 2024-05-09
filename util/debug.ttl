@@ -1,0 +1,24 @@
+; Debug print
+; Arg: newstat
+; Will append [DEBUG] to string if newline is present, otherwise appends to previous line.
+if debug then
+	ifdefined newstat
+	if result = 0 then
+		messagebox 'debug.ttl: No debug message defined'
+		exit
+	endif
+	
+	; Check if newstat begins with a newline
+	strscan newstat #10
+	if result = 1 then
+		strremove newstat 1 1 ; Trim leading newline
+		tmp = newstat
+		newstat = #10'[DEBUG] '
+		strconcat newstat tmp
+	endif
+	
+	strconcat statstr newstat
+	statusbox statstr hostname
+endif
+newstat = ''
+exit

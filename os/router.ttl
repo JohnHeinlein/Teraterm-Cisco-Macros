@@ -8,6 +8,10 @@
 ; | - Reboot to restore confreg in ROMMON
 ; '--------------------------------------
 
+if debug then
+	newstat = #10'[DEBUG] Entered router.ttl'
+	include stat
+endif
 
 wait 'Router>'
 sendln 'enable'
@@ -15,11 +19,19 @@ wait 'Router#'
 
 ; Disable logging to console while we're working.
 ; Too much of a pain to worry about std out being spammed
+if debug then
+	newstat =  #10'[DEBUG] Configuring terminal logging...'
+	include stat
+endif
 sendln 'configure terminal'
 wait 'Router(config)#'
 sendln 'no logging console'
 wait 'Router(config)#'
 sendln 'exit'
+if debug then
+	newstat = ' done!'
+	include stat
+endif
 
 ; .======================================
 ; | Wait for stdout to finish spamming after boot.
@@ -38,15 +50,16 @@ include 'util\flash_wipe.ttl'
 newstat = #10'Clearing NVRAM...'
 include stat
 
+send #13
 wait 'Router#'
 sendln 'write erase'
 wait '[confirm]'
 send #13
-wait 'Initialized the geometry of nvram'
+waitregex 'Initialized the geometry of nvram' 'Erase of nvram: complete'
 pause 1
 
-strconcat statstr ' done!'
-statusbox statstr hostname
+newstat = ' done!'
+include stat
 
 ; .======================================
 ; | Re-enable console logging
@@ -61,16 +74,12 @@ sendln 'exit'
 ; .======================================
 ; | Reboot and disable confreg
 ; '--------------------------------------
-;if debug = 1 then
-;	messagebox 'Debug exit' 'DEBUG'
-;	exit ; Don't reboot
-;endif
 
-newstat = #10'Rebooting to reset confreg..'
+newstat = #10'Rebooting to reset confreg...'
 include stat
 
 sendln 'reload'
-waitregex '[confirm]' '[yes/no]'
+waitregex '\[confirm\]' '\[yes/no\]'
 if result = 2 then
 	sendln 'no'
 	wait '[confirm]'
@@ -85,4 +94,11 @@ sendbreak ; Second break just because it might be a little spicy
 wait 'rommon'
 sendln 'confreg 0x2102'
 
+newstat = ' done!'
+include stat
+
+if debug then
+	newstat = #10'[DEBUG] Exiting router.ttl'
+	include stat
+endif
 exit

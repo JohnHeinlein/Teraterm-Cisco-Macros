@@ -16,8 +16,11 @@ if result = 0 statstr = ''
 gethostname hostname
 
 ifdefined newstat
-if result = 0 messagebox 'ERR: newstat undefined!' 'ERR'
-; /init
+if result = 0 then
+	;messagebox 'ERR: newstat undefined!'
+	statusbox statstr hostname
+	exit
+endif
 
 ; .======================================
 ; | Cache global variables
@@ -52,27 +55,19 @@ while (len_stat + len_newstat) > 510
 	int2str len_newstat_str len_newstat
 	int2str total_len_str (len_stat + len_newstat)
 	
-	if debug then
-		tmp = 'Statstr length: '
-		strconcat tmp len_stat_str
-		strconcat tmp #10'Newstat length: '
-		strconcat tmp len_newstat_str
-		strconcat tmp #10'Total: '
-		strconcat tmp total_len_str
-		messagebox tmp 'DEBUG: Stat'
-	endif
-	;/debug
-	
 loop ;while (len_stat + len_newstat) > 510 ;511 max len, keep space for newline
 
 ; Append newstat to current stat body and display
-strconcat statstr #10
+;strconcat statstr #10
 strconcat statstr newstat
-strlen statstr
-int2str charcount result
-strconcat hostname ' ['
-strconcat hostname charcount
-strconcat hostname '/511]'
+; Debug: length of statstr vs max str len
+if debug then
+	strlen statstr
+	int2str charcount result
+	strconcat hostname ' ['
+	strconcat hostname charcount
+	strconcat hostname '/511]'
+endif
 statusbox statstr hostname
 
 ; Restore global variables

@@ -8,6 +8,7 @@
 ; Aliases for subrouines
 dir_flash = 'util\dir_flash.ttl'
 stat = 'util\stat.ttl'
+db = 'util\debug.ttl'
 
 ; .======================================
 ; | Debugging
@@ -16,17 +17,22 @@ stat = 'util\stat.ttl'
 ; |	so I run it from here instead of having a bunch
 ; |	of repeated debugging code
 ; '--------------------------------------
-debug = 0
+debug = 1
 if debug then
-	statstr = ''
 	gethostname hostname
 	strconcat hostname ' [DEBUG]'
-	statusbox statstr hostname
+	newstat = 'init'
+	include db
 	
-	include 'os\cat3k.ttl'
-	; Call subroutines here
+	; File to test
+	totest = ''
+	
+	strlen totest
+	if result > 0 then
+		include totest
+		end
+	endif
 endif
-
 
 ; .======================================
 ; | init
@@ -36,7 +42,7 @@ gethostname hostname
 statusbox statstr hostname
 
 ; .======================================
-; | DIY Switch statement
+; | Model selector (DIY switch statement)
 ; |--------------------------------------
 ; | Once in ROMMON, we use some heuristic to determine the model of switch.
 ; | Not trivial, since different switches can have dramatically different 
@@ -79,7 +85,7 @@ if result = 1 then
 		
 		strmatch inputstr 'rommon [0-9]+'
 		if result = 1 then
-			newstat = '"version" command invalid, Router assumed'
+			newstat = 'Router assumed'
 			include stat
 			include 'rommon\isr.ttl'
 			include 'os\router.ttl'
@@ -87,18 +93,19 @@ if result = 1 then
 		endif
 
 	endif
-	goto no_match
+	
+	if result = 0 goto no_match
 endif
 
 
 :finish
-clearscreen 1
+;clearscreen 1
 gethostname hostname
 endMessage = hostname
 strconcat endMessage ' finished!'
 messagebox endMessage hostname
-exit
+end
 
 :no_match
 messagebox 'No supported device detected, exiting' 'Err'
-exit
+end
