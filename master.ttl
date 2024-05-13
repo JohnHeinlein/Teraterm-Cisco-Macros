@@ -74,6 +74,15 @@ if result = 1 then
 		goto finish
 	endif
 	
+	strmatch inputstr '^C3750[A-Z]?\s'
+	if result = 1 then
+		newstat = '**C3750 ROMMON Detected**'
+		include stat
+		include 'rommon\2960.ttl'
+		include 'os\switch.ttl'
+		goto finish
+	endif
+	
 	; If version fails, it should be a router.
 	; DEFINITELY subject to change, pending more strange devices.
 	strmatch inputstr 'command \"version\" not found'
@@ -99,11 +108,18 @@ endif
 
 
 :finish
-;clearscreen 1
+if debug != 1then
+	clearscreen 1
+	include dir_flash
+endif
+
 gethostname hostname
-endMessage = hostname
+endMessage = #10#10
+strconcat endMessage hostname
 strconcat endMessage ' finished!'
-messagebox endMessage hostname
+strconcat statstr endMessage
+messagebox statstr 'Done!'
+
 end
 
 :no_match
