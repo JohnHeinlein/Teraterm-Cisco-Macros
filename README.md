@@ -25,7 +25,6 @@ Additionally, I've probably severely abused/misused language features, as TTL is
 > Prints additional information to status box
 
 # Tested compatible
-Device classes:
 - 2960 series switches (C2960, C2960S, C2960X)
   - WS-C2960-24PC-L / WS-C2960+24PC-L
   - WS-C2960-48TT-L
