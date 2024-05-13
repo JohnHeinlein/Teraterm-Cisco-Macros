@@ -1,9 +1,8 @@
 ; .======================================
 ; | Catalyst 3000 Series Wiping Macro
-; |======================================
-; | Some unique shenanigans, since ROMMON is weird
-; '--------------------------------------
-
+; '======================================
+newstat = 'Entering os/cat3k.ttl'
+include db2
 ; .======================================
 ; | Wait for stdout to finish spamming
 ; '--------------------------------------
@@ -30,11 +29,14 @@ sendln 'write erase'
 wait '[confirm]'
 send #13
 
-; .======================================
-; | Reset config register from within IOS
-; '--------------------------------------
-
 wait 'Switch#'
+
+newstat = ' done!'
+include stat
+
+; .======================================
+; | Reboot & reset env vars
+; '--------------------------------------
 sendln 'reload'
 waitregex '\[yes/no\]' '\[confirm\]'
 if result = 1 then
@@ -43,13 +45,25 @@ if result = 1 then
 endif
 send #13
 
-wait 'Interrupt the system within 5 seconds'
-sendbreak
-pause 1
-sendbreak
-wait 'switch:'
-	sendln 'set SWITCH_IGNORE_STARTUP_CFG 0'
-	sendln 'set ENABLE_BREAK no'
-endif
+newstat = #10'Rebooting to reset env flags...'
+include stat
 
+wait 'Interrupt the system within 5 seconds'
+timeout = 5
+do
+	newstat = #10'Sending BREAKs'
+	include db
+	
+	sendbreak
+	pause 1
+	sendbreak
+	
+	sssswait 'switch:'
+loop while result = 0
+
+sendln 'set SWITCH_IGNORE_STARTUP_CFG 0'
+sendln 'set ENABLE_BREAK no'
+
+newstat = 'Exiting os/cat3k.ttl'
+include db2
 exit
