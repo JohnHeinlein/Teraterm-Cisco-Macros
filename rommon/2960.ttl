@@ -14,17 +14,14 @@ setsync 1
 
 ; Init flash
 sendln 'flash_init'
-;waitregex 'MORE' '^switch:\s$' 'already initialized\.$' ; Sync will match prompt for most recent command without EOL
-;if result = 1 then
-;	send ' '
-;	pause 1
-;	send ' ' ; Seems to skip sometimes.+
-;endif
+
+newstat = #10'Waiting for flash init...'
+include db
 
 do
 	waitregex 'MORE' '^switch:\s$' 'already initialized\.$'
 	if result = 1 send ' '
-loop while result = 1
+loop while result != 2
 
 ; .=========================
 ; | Wipe common files

@@ -7,7 +7,7 @@ timeout = 0
 
 sendln 'dir flash:'
 do
-	waitregex '(MORE)|(More)' '^(([Ss]witch)|([rR]outer))[#>:]'
+	waitregex '(MORE)|(More)' '^(([Ss]witch)|([rR]outer)|(rommon\s[0-9]+\s))[#>:]'
 	if result = 1 send ' '
 loop while result != 2
 

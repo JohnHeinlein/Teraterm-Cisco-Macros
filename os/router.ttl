@@ -94,6 +94,8 @@ sendbreak ; Second break just because it might be a little spicy
 wait 'rommon'
 sendln 'confreg 0x2102'
 
+include dir_flash
+
 newstat = ' done!'
 include stat
 
@@ -101,4 +103,5 @@ if debug then
 	newstat = #10'[DEBUG] Exiting router.ttl'
 	include stat
 endif
+
 exit

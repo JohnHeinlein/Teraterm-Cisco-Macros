@@ -4,7 +4,7 @@
 ; | Currently only tested on 3650 and 2960 series.
 ; '--------------------------------------
 
-newstat = 'Entered switch.ttl'
+newstat = #10'Entered switch.ttl'
 include db
 
 ; .======================================
@@ -37,15 +37,23 @@ include 'util\flash_wipe.ttl'
 include dir_flash
 
 newstat = #10'Wiping NVRAM...'
-include db
+include stat
 
 sendln 'write erase'
 wait '[confirm]'
 send #13
-wait 'Initialized the geometry of nvram'
+
+; This somehow got skipped as a 'wait' command
+; This construct is similar to how we wait for 'MORE' prompts.
+timeout = 2
+do
+	waitregex 'Initialized the geometry of nvram' 'Switch#'
+	if result = 1 send #13
+loop while result = 0
+
 pause 1
 
 newstat = ' done!'
-include db
+include stat
 
 exit

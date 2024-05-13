@@ -3,10 +3,12 @@
 ; |======================================
 ; | Scrolls if we exceed string length
 ; | Called as:
-; |   newstat = 'new status line'
-; |   include 'util\stat.ttl'
+; |   > newstat = 'new status line'
+; |   > include stat
 ; | - 'newstat' is cleared after each call
 ; | - 'statstr' retains content for use elsewhere
+; | util\debug.ttl checks debug status and prefaces 
+; | newlines with [DEBUG] before calling this file.
 ; '--------------------------------------
 
 ; init

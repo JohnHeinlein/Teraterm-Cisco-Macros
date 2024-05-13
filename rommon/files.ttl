@@ -8,7 +8,10 @@ setsync 1
 
 ;pause 5
 ;wait #10'switch:'
-sendln 'del flash:config.text'
+send #13
+send 'del flash:confi' ; For whatever reason, we can sometimes only send 16 characters. Extremely suspicious, idk man
+send 'g.text'
+send #13
 wait '(y/n)?'
 sendln 'y'
 

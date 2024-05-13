@@ -17,8 +17,9 @@ if debug then
 		strconcat newstat tmp
 	endif
 	
-	strconcat statstr newstat
-	statusbox statstr hostname
+	;strconcat statstr newstat
+	;statusbox statstr hostname
+	include stat
 endif
 newstat = ''
 exit
