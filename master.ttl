@@ -84,18 +84,24 @@ if result = 1 then
 	endif
 	
 	; If version fails, it should be a router.
-	; DEFINITELY subject to change, pending more strange devices.
+	; Some "routers" will print a blank line before the actual error. This block consumes that.
+	strmatch inputstr ''
+	if result > 0 then
+		newstat = #10'Blank version'
+		include db
+		recvln
+	endif ; Important to fall through here.
+
 	strmatch inputstr 'command \"version\" not found'
 	if result > 0 then
-		:router
 		setsync 1
 		sendln ''
 		recvln
 		setsync 0
 		
 		strmatch inputstr 'rommon [0-9]+'
-		if result = 1 then
-			newstat = 'Router assumed'
+		if result > 0 then
+			newstat = #10'Router assumed'
 			include stat
 			include 'rommon\isr.ttl'
 			include 'os\router.ttl'
@@ -104,12 +110,7 @@ if result = 1 then
 		goto no_match
 	endif
 	
-	strmatch inputstr ''
-	if result > 0 then
-		newstat = #10'Blank version'
-		include db
-		goto router
-	endif
+	
 	if result = 0 goto no_match
 endif
 
