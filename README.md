@@ -6,7 +6,11 @@ Incredibly WIP. Edge cases exist, and are everywhere, even for supported models.
 Additionally, I've probably severely abused/misused language features, as TTL is almost as old as I am, and the docs are translated from Japanese.
 
 > [!WARNING]
-> Currently only wipes files from flash. May be extended for license info, etc, in the future
+> Currently only wipes non-essential files from flash. May be extended for license info, etc, in the future. Always double-check!
+> 'Essential file' is determined by matching the regular expression `((PTW)|(SE[0-9])|(E(X?)[0-9])|(\.bin)|(\.conf)|(\.lic)|(\.pkg)|(\.pack)$)` found in `util/flash_wipe.ttl`
+
+> [!NOTE]
+> I recommend notepad++ with [TTL Language support](https://github.com/notepad-plus-plus/userDefinedLanguages/blob/master/UDLs/TeraTermLanguage_allCmdsV4.xml) from NPP's official repo to edit files.
 
 # Usage
 - Break into ROMMON / Bootloader
@@ -20,22 +24,29 @@ Additionally, I've probably severely abused/misused language features, as TTL is
 > Debugging can be set with a flag at the top of master.ttl, where individual files can alo be run while preserving the relative paths to shared subroutines.
 > Prints additional information to status box
 
-> [!NOTE]
-> I recommend notepad++ with [TTL Language support](https://github.com/notepad-plus-plus/userDefinedLanguages/blob/master/UDLs/TeraTermLanguage_allCmdsV4.xml) from NPP's official repo to edit files.
-
 # Tested compatible
-- 2960 series switches
-  - C2960
-  - C2960S
-  - C2960X
-- 3000 series switches
-  - C3750E
-	- WS-C3750X-24P-S
-  - CAT3K
-	- 3650
-- Integrated Service Routers
+Device classes:
+- 2960 series switches (C2960, C2960S, C2960X)
+  - WS-C2960-24PC-L / WS-C2960+24PC-L
+  - WS-C2960-48TT-L
+  - WS-C2960-48PST-L
+  - WS-C2960X-24PS-L
+  - WS-C2960X-48TD-L
+  - WS-C2960X-48FPS-L
+  - WS-C2960X-48LPS-L
+- 3000 series switches (C3750E, CAT3K)
+  - WS-C3750X-24P-S
+  - WS-C3650-24TS-E
+  - WS-C3650-24PS-S
+- Integrated service routers
   - ISR4331 (See [FN64253](https://www.cisco.com/c/en/us/support/docs/field-notices/642/fn64253.html))
   - 2901
+- Gateways
+  - VG310 (Detected as a router)
+
+> [!NOTE]
+> More models than listed may work, given a ROMMON & OS structure similar to existing models.
+> For example, 3750's are essentially identical to 2960's, so we just call those subroutines.
 
 # To do
 - ISR
