@@ -9,17 +9,19 @@
 dir_flash = 'util\dir_flash.ttl'
 stat = 'util\stat.ttl'
 db = 'util\debug.ttl'
+db2 = 'util\debug2.ttl' ; Wrapper to check for debug level 2
 
 ; .======================================
 ; | Debugging
 ; |--------------------------------------
-; | Running files directly messes up the relative paths,
-; |	so I run it from here instead of having a bunch
-; |	of repeated debugging code
+; | Running files directly messes up the relative paths.
+; | Set 'totest' to path & name of file to test
+; | debug = 1 -> Some extra logging
+; | debug = 2 -> Log entry & exit of subroutines
 ; '--------------------------------------
 debug = 1
 totest = '' ; If none is specified, 'debug = 1' just enables debug messages.
-if debug then
+if debug > 0 then
 	gethostname hostname
 	strconcat hostname ' [DEBUG]'
 	newstat = 'init'
@@ -83,7 +85,7 @@ if result = 1 then
 	
 	; If version fails, it should be a router.
 	; DEFINITELY subject to change, pending more strange devices.
-	strmatch inputstr '(\nmonitor: )?command \"version\" not found'
+	strmatch inputstr 'command \"version\" not found'
 	if result > 0 then
 		:router
 		setsync 1
@@ -99,13 +101,21 @@ if result = 1 then
 			include 'os\router.ttl'
 			goto finish
 		endif
+		goto no_match
+	endif
+	
+	strmatch inputstr ''
+	if result > 0 then
+		newstat = #10'Blank version'
+		include db
+		goto router
 	endif
 	if result = 0 goto no_match
 endif
 
 
 :finish
-if debug != 1then
+if debug < 1 then
 	clearscreen 1
 	include dir_flash
 endif
