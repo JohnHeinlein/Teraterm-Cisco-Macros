@@ -18,14 +18,12 @@ db = 'util\debug.ttl'
 ; |	of repeated debugging code
 ; '--------------------------------------
 debug = 1
+totest = '' ; If none is specified, 'debug = 1' just enables debug messages.
 if debug then
 	gethostname hostname
 	strconcat hostname ' [DEBUG]'
 	newstat = 'init'
 	include db
-	
-	; File to test
-	totest = ''
 	
 	strlen totest
 	if result > 0 then
