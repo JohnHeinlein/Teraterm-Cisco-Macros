@@ -18,8 +18,12 @@ include stat
 ; | Wait for "Press RETURN" prompt
 ; '--------------------------------------
 timeout = 0
-wait 'Press RETURN'
-send #13 ;ASCII CR
+
+do ; Some models will prompt for setup when the config is ignored.
+	waitregex 'Press RETURN' '\[yes/no\]'
+	if result = 1 send #13
+	if result = 2 sendln 'no'
+loop while result != 1
 
 newstat =  ' done!'
 include stat
