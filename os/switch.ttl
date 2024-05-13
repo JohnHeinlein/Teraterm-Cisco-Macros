@@ -1,16 +1,12 @@
 ; .======================================
 ; | Switch wiping macro
-; |======================================
-; | Currently only tested on 3650 and 2960 series.
-; '--------------------------------------
-
-newstat = #10'Entered switch.ttl'
-include db
+; '======================================
+newstat = #10'Entered os/switch.ttl'
+include db2
 
 ; .======================================
 ; | Decline setup prompts
 ; '--------------------------------------
-
 waitregex '\[yes\]' '\[yes/no\]' 'Switch>'; Some switches prompt for setup termination
 if result = 1 then
 	sendln 'yes'
@@ -44,7 +40,6 @@ wait '[confirm]'
 send #13
 
 ; This somehow got skipped as a 'wait' command
-; This construct is similar to how we wait for 'MORE' prompts.
 timeout = 2
 do
 	waitregex 'Initialized the geometry of nvram' 'Switch#'
@@ -56,4 +51,6 @@ pause 1
 newstat = ' done!'
 include stat
 
+newstat = #10'Exiting os/switch.ttl'
+include db2
 exit

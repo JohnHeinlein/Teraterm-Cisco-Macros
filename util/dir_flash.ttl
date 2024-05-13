@@ -1,8 +1,8 @@
 ; Some devices will have enough files to trigger a "more" prompt when listing contents
+newstat = #10'Entering util/dir_flash.ttl'
+include db2
 
-; Cache global
-timeout_tmp = timeout
-
+timeout_tmp = timeout ; Cache global
 timeout = 0
 
 sendln 'dir flash:'
@@ -11,6 +11,8 @@ do
 	if result = 1 send ' '
 loop while result != 2
 
-; Restore global & exit
-timeout = timeout_tmp
+timeout = timeout_tmp ; Restore global & exit
+
+newstat = #10'Exiting util/dir_flash.ttl'
+include db2
 exit

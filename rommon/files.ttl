@@ -1,7 +1,9 @@
 ; This file just contains delete statements for basic ROMMON files, so they don't need to be repeated
+newstat = 'Entering rommon/files.ttl'
+include db2
 
-strconcat statstr #10'Wiping standard switch files...'
-statusbox statstr hostname
+newstat = #10'Wiping standard switch files...'
+include stat
 
 setsync 1
 ;include 'util\dir_flash.ttl' ; List flash contents
@@ -36,10 +38,13 @@ sendln 'y'
 wait #10'switch:'
 ;pause 1
 
-include 'util\dir_flash.ttl'
+include dir_flash
 
 setsync 0
 
-strconcat statstr ' done!'
-statusbox statstr hostname
+newstat = ' done!'
+include stat
+
+newstat = 'Exiting rommon/files.ttl'
+include db2
 exit

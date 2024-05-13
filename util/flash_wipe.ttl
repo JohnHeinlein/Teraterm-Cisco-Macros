@@ -7,12 +7,12 @@
 ; | - TODO:
 ; | 	- Somehow detect length of output and size array appropriately?
 ; '--------------------------------------
+newstat = #10'Entering util/flash_wipe.ttl'
+include db2
 
 ; Cache globals
 old_timeout = timeout
 
-newstat = #10'flash_wipe.ttl'
-include db
 
 if debug = 2 then
 	newstat = #10'[DEBUG] Creating fake dirs...'
@@ -136,13 +136,12 @@ next
 newstat = ' done!'
 include stat
 
-if debug include dir_flash
-newstat = #10'End of flash_wipe.ttl'
-include db
-
 setsync 0
 
 ; Restore globals
 timeout = old_timeout
 
+if debug > 0 include dir_flash
+newstat = #10'Exiting util/flash_wipe.ttl'
+include db2
 exit

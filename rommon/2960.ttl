@@ -1,13 +1,12 @@
-; =========================
-; C2960 Rommon Wipe
-; =========================
-; - 2960 units are not write-protected
-; - Wipe a set of common files, including configs
-; - Boot and clear remainder dynamically
-;--------------------------------------
-
-newstat = #10'Entering 2960.ttl'
-include db
+; .======================================
+; | C2960 Rommon Wipe
+; |======================================
+; | - 2960 units are not write-protected
+; | - Wipe a set of common files, including configs
+; | - Boot and clear remainder dynamically
+; '--------------------------------------
+newstat = #10'Entering rommon/2960.ttl'
+include db2
 
 timeout = 0
 setsync 1
@@ -16,12 +15,15 @@ setsync 1
 sendln 'flash_init'
 
 newstat = #10'Waiting for flash init...'
-include db
+include stat
 
 do
 	waitregex 'MORE' '^switch:\s$' 'already initialized\.$'
 	if result = 1 send ' '
 loop while result != 2
+
+newstat = ' done!'
+include stat
 
 ; .=========================
 ; | Wipe common files
@@ -41,5 +43,8 @@ send #13 ;ASCII CR
 
 newstat = ' done!'
 include stat
+
+newstat = #10'Exiting rommon/2960.ttl'
+include db2
 
 exit

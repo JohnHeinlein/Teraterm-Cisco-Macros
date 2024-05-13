@@ -1,10 +1,14 @@
+; Waits for recvln to be blank for a period of time, so we can assume std out has calmed down.
+newstat = #10'Entering util/stdout.ttl'
+include db2
+
 newstat = #10'Waiting for std out to quiet down...'
-include 'util/stat.ttl'
+include stat
 
 timeout_old = timeout
 
-if debug = 1 then
-	timeout = 1 ; When debugging, there will be no std out
+if debug > 0 then
+	timeout = 1
 else
 	timeout = 10
 endif
@@ -14,8 +18,10 @@ do
 loop while result = 1
 
 newstat = ' done!'
-include 'util/stat.ttl'
+include stat
 
 timeout = timeout_old
 
+newstat = #10'Exiting util/stdout.ttl'
+include db2
 exit

@@ -7,11 +7,8 @@
 ; | - Clear NVRAM to prompt initial setup dialog on next boot
 ; | - Reboot to restore confreg in ROMMON
 ; '--------------------------------------
-
-if debug then
-	newstat = #10'[DEBUG] Entered router.ttl'
-	include stat
-endif
+newstat = #10'Entering os/router.ttl'
+include db2
 
 wait 'Router>'
 sendln 'enable'
@@ -99,9 +96,6 @@ include dir_flash
 newstat = ' done!'
 include stat
 
-if debug then
-	newstat = #10'[DEBUG] Exiting router.ttl'
-	include stat
-endif
-
+newstat = #10'Exiting os/router.ttl'
+include db2
 exit

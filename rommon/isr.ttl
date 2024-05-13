@@ -4,20 +4,15 @@
 ; | - Set confreg to ignore configs
 ; | - Reboot to wipe dynamically
 ; '--------------------------------------
-
-if debug then
-	newstat = #10'[DEBUG] Entering isr.ttl'
-	include stat
-endif
+newstat = #10'Entering rommon/isr.ttl'
+include db2
 
 sendln 'confreg 0x2142'
 wait 'rommon'
 sendln 'reset'
 
-; Verbosity -----
-	newstat =  #10'Booting ROUTER...'
-	include stat
-; ----- ----- -----
+newstat =  #10'Booting ROUTER...'
+include stat
 
 ; .======================================
 ; | Wait for "Press RETURN" prompt
@@ -26,14 +21,9 @@ timeout = 0
 wait 'Press RETURN'
 send #13 ;ASCII CR
 
-; Verbosity -----
-	newstat =  ' done!'
-	include stat
-; ----- ----- -----
+newstat =  ' done!'
+include stat
 
-if debug then
-	newstat = #10'[DEBUG] Exiting isr.ttl'
-	include stat
-endif
-
+newstat = #10'Exiting rommon/isr.ttl'
+include db2
 exit
