@@ -85,8 +85,9 @@ if result = 1 then
 	
 	; If version fails, it should be a router.
 	; DEFINITELY subject to change, pending more strange devices.
-	strmatch inputstr 'command \"version\" not found'
+	strmatch inputstr '(\nmonitor: )?command \"version\" not found'
 	if result > 0 then
+		:router
 		setsync 1
 		sendln ''
 		recvln
@@ -100,9 +101,7 @@ if result = 1 then
 			include 'os\router.ttl'
 			goto finish
 		endif
-
 	endif
-	
 	if result = 0 goto no_match
 endif
 
