@@ -40,3 +40,13 @@ Additionally, I've probably severely abused/misused language features, as TTL is
   - Many are re-used as functions to list the flash directory, build a file array, or for logging
 - Proper logging
   - Currently only uses `statusbox` with a bunch of custom logic in `stat.ttl`.
+
+# Known issues
+- After boot, many systems will continue to spam console with diagnostic information as stdout
+  - Potentially messes up anything that requires newlines (`waitln`, `recvln`, etc.)
+  - Requires looping timeouts, careful regex checks on `dir flash:` output, etc.
+  - CAT3K units have `configure terminal` options to disable logging
+    - Only requires `wait` commands (no newlines), so is resistant to the spam   
+- `files.ttl`, which deletes common files from rommon, rarely only sends 16 characters at a time
+  - I genuinely have no idea how or why. I've just split 'send' commands into 16 char chunks whenever it happens
+- `wipe_flash.ttl` only has room for 200 files at a time. Arrays cap at 65536 (2^16) elements, but I haven't tested if larger values have any noticeable impact on memory or speed. They shouldn't, since those values are only initialized and not iterated over, but this language does weird stuff all the time.
