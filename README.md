@@ -20,6 +20,9 @@ Additionally, I've probably severely abused/misused language features, as TTL is
 > Debugging can be set with a flag at the top of master.ttl, where individual files can alo be run while preserving the relative paths to shared subroutines.
 > Prints additional information to status box
 
+> [!NOTE]
+> I recommend notepad++ with [TTL Language support](https://github.com/notepad-plus-plus/userDefinedLanguages/blob/master/UDLs/TeraTermLanguage_allCmdsV4.xml) from NPP's official repo to edit files.
+
 # Tested compatible
 - 2960 series switches
   - C2960
