@@ -39,7 +39,7 @@ Additionally, I've probably severely abused/misused language features, as TTL is
 - Documentation for subroutines
   - Many are re-used as functions to list the flash directory, build a file array, or for logging
 - Proper logging
-  - Currently only uses `statusbox` with a bunch of custom logic in `stat.ttl`.
+  - Currently only uses `statusbox` with a bunch of custom logic in `stat.ttl` and `db.ttl`.
 
 # Known issues
 - After boot, many systems will continue to spam console with diagnostic information as stdout
