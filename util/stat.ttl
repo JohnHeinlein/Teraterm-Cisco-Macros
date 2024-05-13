@@ -22,6 +22,7 @@ if result = 0 then
 	exit
 endif
 
+
 ; .======================================
 ; | Cache global variables
 ; '--------------------------------------
@@ -32,6 +33,16 @@ ifdefined groupmatchstr2
 if result tmp_groupmatchstr2 = groupmatchstr2
 
 ; .======================================
+; | Remove leading newline for the first message
+; '--------------------------------------
+strlen statstr
+if result = 0 then
+	strmatch newstat '\n'
+	if result = 1 then
+		strremove newstat 1 1
+	endif
+endif
+; .======================================
 ; | Remove as many lines from the top as necessary
 ; '--------------------------------------
 strlen statstr
@@ -41,21 +52,19 @@ strlen newstat
 len_newstat = result
 while (len_stat + len_newstat) > 510
 
-	; Split by newlines, store into 2 variables
-	; (Pop off topmost line)
+	; Split by newlines, store into 2 variables (Pop off topmost line)
 	strsplit statstr #10 2
 	
-	; Everything but the first line
+	; Keep everything but the first line
 	statstr = groupmatchstr2
 	strlen statstr
 	len_stat = result
 	
 	;debug
-	int2str len_stat_str len_stat
-	int2str len_newstat_str len_newstat
-	int2str total_len_str (len_stat + len_newstat)
-	
-loop ;while (len_stat + len_newstat) > 510 ;511 max len, keep space for newline
+	;int2str len_stat_str len_stat
+	;int2str len_newstat_str len_newstat
+	;int2str total_len_str (len_stat + len_newstat)
+loop
 
 ; Append newstat to current stat body and display
 ;strconcat statstr #10
