@@ -10,8 +10,6 @@
 ; | util\debug.ttl checks debug status and prefaces 
 ; | newlines with [DEBUG] before calling this file.
 ; '--------------------------------------
-
-; init
 ifdefined statstr
 if result = 0 statstr = ''
 
