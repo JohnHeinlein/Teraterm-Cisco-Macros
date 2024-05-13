@@ -3,7 +3,7 @@ Developed on TeraTerm 5.2 (latest as of time of writing). Older versions may not
 
 Incredibly WIP. Edge cases exist, and are everywhere, even for supported models.
 
-Additionally, I've probably severely abused/misused language features, as TTL is almost as old as I am and has barely changed in that time.
+Additionally, I've probably severely abused/misused language features, as TTL is almost as old as I am, and the docs are translated from Japanese.
 
 > [!WARNING]
 > Currently only wipes files from flash. May be extended for license info, etc, in the future
