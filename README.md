@@ -1,13 +1,17 @@
 TeraTerm Macro (.ttl) files designed to factory reset various Cisco devices.
-Developed on TeraTerm 5.2 (latest as of time of writing). Older versions may not support some language features
+Developed on TeraTerm 5.2 (latest as of time of writing). Older versions may not support some language features.
 
-Incredibly WIP. Edge cases exist, and are everywhere, even for supported models.
+Currently pretty solid, especially for 2960 series switches. Some edge cases absolutely exist due to the [unreliable](https://en.wikipedia.org/wiki/Reliability_(computer_networking)) nature of RS-232 as these devices use it.
+I've attempted to get around some issues by looping checks, sending extra characters, etc, but this will always be fundamentally flawed.
 
-Additionally, I've probably severely abused/misused language features, as TTL is almost as old as I am, and the docs are translated from Japanese.
+Additionally, I've probably abused some language features. TTL is almost as old as I am, and the docs seem to be (sometimes poorly) translated from Japanese.
 
 > [!WARNING]
 > Currently only wipes non-essential files from flash. May be extended for license info, etc, in the future. Always double-check!
-> 'Essential file' is determined by matching the regular expression `((PTW)|(SE[0-9])|(E(X?)[0-9])|(\.bin)|(\.conf)|(\.lic)|(\.pkg)|(\.pack)$)` found in `util/flash_wipe.ttl`
+> 
+> 'Essential file' is determined by matching the regular expression found in `util/flash_wipe.ttl`:
+> 
+> `((PTW)|(SE[0-9])|(E(X?)[0-9])|(\.bin)|(\.conf)|(\.lic)|(\.pkg)|(\.pack)$)`
 
 > [!NOTE]
 > I recommend notepad++ with [TTL Language support](https://github.com/notepad-plus-plus/userDefinedLanguages/blob/master/UDLs/TeraTermLanguage_allCmdsV4.xml) from NPP's official repo to edit files.
@@ -17,7 +21,7 @@ Additionally, I've probably severely abused/misused language features, as TTL is
   - Varies depending on model: hold MODE, send break, etc
 - Run `master.ttl` from TeraTerm's Control menu
   - `Control -> Macro -> master.ttl`
-  - Model is detected automatically based on information obtainable in ROMMON. See Tested Compatible section
+  - Model is detected automatically based on information obtainable in ROMMON.
 - Look cool while it does all of the work
 
 > [!NOTE]
@@ -66,3 +70,4 @@ Additionally, I've probably severely abused/misused language features, as TTL is
 - `files.ttl`, which deletes common files from rommon, rarely only sends 16 characters at a time
   - I genuinely have no idea how or why. I've just split 'send' commands into 16 char chunks whenever it happens
 - `wipe_flash.ttl` only has room for 200 files at a time. Arrays cap at 65536 (2^16) elements, but I haven't tested if larger values have any noticeable impact on memory or speed. They shouldn't, since those values are only initialized and not iterated over, but this language does weird stuff all the time.
+- Reboot breaks sometimes don't register. Sending a bunch of them seems to make it fail less. That's pretty cool.
