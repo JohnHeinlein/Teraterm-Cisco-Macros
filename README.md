@@ -28,9 +28,11 @@ Additionally, I've probably severely abused/misused language features, as TTL is
   - C2960
   - C2960S
   - C2960X
-- 3000 series Switches
+- 3000 series switches
   - C3750E
-  - 3650 (CAT3K)
+	- WS-C3750X-24P-S
+  - CAT3K
+	- 3650
 - Integrated Service Routers
   - ISR4331
 
