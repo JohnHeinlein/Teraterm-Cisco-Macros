@@ -70,7 +70,7 @@ loop
 ;strconcat statstr #10
 strconcat statstr newstat
 ; Debug: length of statstr vs max str len
-if debug then
+if debug_mode > 0 then
 	strlen statstr
 	int2str charcount result
 	strconcat hostname ' ['
