@@ -57,36 +57,17 @@ include stat
 ; .======================================
 ; | Re-enable console logging
 ; '--------------------------------------
+newstat = #10'Resetting logging & confreg...'
+include stat
+
 wait 'Router#'
 sendln 'configure terminal'
 wait 'Router(config)#'
 sendln 'logging console 5'
 wait 'Router(config)#'
+sendln 'config-register 0x2102'
+wait 'Router(config)#'
 sendln 'exit'
-
-; .======================================
-; | Reboot and disable confreg
-; '--------------------------------------
-
-newstat = #10'Rebooting to reset confreg...'
-include stat
-
-sendln 'reload'
-waitregex '\[confirm\]' '\[yes/no\]'
-if result = 2 then
-	sendln 'no'
-	wait '[confirm]'
-endif
-send #13
-
-; TODO: Reimplement as loop? No issues so far, but might come up like with cat3k units.
-timeout = 0
-wait '#####' ;Boot spams octothorpes; just capture a few
-sendbreak ; Re-enter ROMMON
-;pause 1
-sendbreak ; Second break just because it might be a little spicy
-wait 'rommon'
-sendln 'confreg 0x2102'
 
 include dir_flash
 
