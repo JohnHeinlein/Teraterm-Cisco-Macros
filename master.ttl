@@ -5,11 +5,12 @@
 ; |	calls appropriate subroutines
 ; '--------------------------------------
 
-; Aliases for subrouines
+; Useful string aliases
 dir_flash = 'util\dir_flash.ttl'
 stat = 'util\stat.ttl'
 db = 'util\debug.ttl'
-db2 = 'util\debug2.ttl' ; Wrapper to check for debug level 2
+db2 = 'util\debug2.ttl'
+CRITICAL_FILES = '((PTW)|(SE[0-9])|(E(X?)[0-9])|(\.bin)|(\.conf)|(\.lic)|(\.pkg)|(\.pack)$)' ; Regular expression matching files we DON'T want to delete
 
 ; .======================================
 ; | Debugging
@@ -19,20 +20,9 @@ db2 = 'util\debug2.ttl' ; Wrapper to check for debug level 2
 ; | debug = 1 -> Some extra logging
 ; | debug = 2 -> Log entry & exit of subroutines
 ; '--------------------------------------
-debug = 1
-totest = '' ; If none is specified, 'debug = 1' just enables debug messages.
-if debug > 0 then
-	gethostname hostname
-	strconcat hostname ' [DEBUG]'
-	newstat = 'init'
-	include db
-	
-	strlen totest
-	if result > 0 then
-		include totest
-		end
-	endif
-endif
+debug_mode = 0
+totest = '' ; If none is specified, 'debug_mode = 1' just enables debug messages.
+if debug_mode > 0 call debug
 
 ; .======================================
 ; | init
@@ -47,7 +37,7 @@ strconcat newstat ' init'
 include stat
 
 ; .======================================
-; | Model selector (DIY switch statement)
+; | Model selector
 ; |--------------------------------------
 ; | Once in ROMMON, we use some heuristic to determine the model of switch.
 ; | Not trivial, since different switches can have dramatically different 
@@ -79,6 +69,7 @@ if result = 1 then
 		goto finish
 	endif
 	
+	; Catalyst 3750 series switches
 	strmatch inputstr '^C3750[A-Z]?\s'
 	if result = 1 then
 		newstat = '**C3750 ROMMON Detected**'
@@ -88,38 +79,23 @@ if result = 1 then
 		goto finish
 	endif
 	
-	; If version fails, it should be a router.
-	; Some "routers" will print a blank line before the actual error. This block consumes that.
-	strmatch inputstr ''
+	; Detect any 'rommon' prompt, as opposed to a 'switch' prompt, to assume we're in a router.
+	timeout = 1
+	waitregex 'rommon [0-9]+'
 	if result > 0 then
-		recvln
+		newstat = #10'Router assumed'
+		include stat
+		include 'rommon\isr.ttl'
+		include 'os\router.ttl'
+		goto finish
 	endif
-
-	strmatch inputstr 'command \"version\" not found'
-	if result > 0 then
-		setsync 1
-		sendln ''
-		recvln
-		setsync 0
-		
-		strmatch inputstr 'rommon [0-9]+'
-		if result > 0 then
-			newstat = #10'Router assumed'
-			include stat
-			include 'rommon\isr.ttl'
-			include 'os\router.ttl'
-			goto finish
-		endif
-		goto no_match
-	endif
-	
 	
 	if result = 0 goto no_match
 endif
 
 
 :finish
-if debug < 1 then
+if debug_mode = 0 then
 	clearscreen 1
 	include dir_flash
 endif
@@ -136,3 +112,16 @@ end
 :no_match
 messagebox 'No supported device detected, exiting' 'Err'
 end
+
+:debug
+	gethostname hostname
+	strconcat hostname ' [DEBUG]'
+	newstat = 'init'
+	include db
+	
+	strlen totest
+	if result > 0 then
+		include totest
+		end
+	endif
+return
