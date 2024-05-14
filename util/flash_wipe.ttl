@@ -14,7 +14,7 @@ include db2
 old_timeout = timeout
 
 
-if debug = 2 then
+if debug_mode = 2 then
 	newstat = #10'[DEBUG] Creating fake dirs...'
 	include stat
 	include 'test\mkdir.ttl'
@@ -60,7 +60,7 @@ do
 		; Verbosity
 		filenum = filenum + 1
 		
-		strmatch filename '((PTW)|(SE[0-9])|(E(X?)[0-9])|(\.bin)|(\.conf)|(\.lic)|(\.pkg)|(\.pack)$)'
+		strmatch filename CRITICAL_FILES
 		if result > 0 then
 			savenum = savenum + 1
 		elseif result = 0 then
@@ -114,13 +114,14 @@ for i 0 (delnum - 1)
 	statstr_tmp = statstr ; cache statstr
 		
 	int2str i_str (i + 1)
-	tmp = ' ('
+	tmp = #10' ('
 	strconcat tmp i_str
 	strconcat tmp '/'
 	strconcat tmp delnum_str
 	strconcat tmp ') '
 	
-	if debug strconcat tmp files[i] ; Only append filename in debug mode
+	;if debug_mode > 0 strconcat tmp files[i] ; Only append filename in debug mode
+	strconcat tmp files[i]
 	
 	strconcat statstr tmp
 	statusbox statstr hostname
@@ -141,7 +142,7 @@ setsync 0
 ; Restore globals
 timeout = old_timeout
 
-if debug > 0 include dir_flash
+if debug_mode > 0 include dir_flash
 newstat = #10'Exiting util/flash_wipe.ttl'
 include db2
 exit
