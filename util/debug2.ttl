@@ -1,5 +1,5 @@
 ; Checks for debug level 2 before executing normal debug
-if debug = 2 then
+if debug_mode = 2 then
 	include db
 endif
 newstat = ''

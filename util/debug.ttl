@@ -1,7 +1,7 @@
 ; Debug print
 ; Arg: newstat
 ; Will append [DEBUG] to string if newline is present, otherwise appends to previous line.
-if debug > 0 then
+if debug_mode > 0 then
 	ifdefined newstat
 	if result = 0 then
 		messagebox 'debug.ttl: No debug message defined'
