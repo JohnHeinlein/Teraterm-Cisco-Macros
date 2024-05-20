@@ -58,7 +58,7 @@ do
 	pause 1
 	sendbreak
 	
-	sssswait 'switch:'
+	wait 'switch:'
 loop while result = 0
 
 sendln 'set SWITCH_IGNORE_STARTUP_CFG 0'

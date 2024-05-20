@@ -7,7 +7,7 @@ include stat
 
 timeout_old = timeout
 
-if debug > 0 then
+if debug_mode > 0 then
 	timeout = 1
 else
 	timeout = 10
