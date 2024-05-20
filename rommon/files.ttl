@@ -36,6 +36,11 @@ wait '(y/n)?'
 sendln 'y'
 
 wait #10'switch:'
+sendln 'del flash:nvram_config'
+wait '(y/n)?'
+sendln 'y'
+
+wait #10'switch:'
 ;pause 1
 
 include dir_flash
