@@ -111,22 +111,23 @@ for i 0 (delnum - 1)
 	delstr = 'del /r /f flash:'
 	
 	; dynamically update deletion progress
-	statstr_tmp = statstr ; cache statstr
-		
-	int2str i_str (i + 1)
-	tmp = #10' ('
-	strconcat tmp i_str
-	strconcat tmp '/'
-	strconcat tmp delnum_str
-	strconcat tmp ') '
+	if stat_mode then
+		statstr_tmp = statstr ; cache statstr
+			
+		int2str i_str (i + 1)
+		tmp = #10' ('
+		strconcat tmp i_str
+		strconcat tmp '/'
+		strconcat tmp delnum_str
+		strconcat tmp ') '
 	
-	;if debug_mode > 0 strconcat tmp files[i] ; Only append filename in debug mode
-	strconcat tmp files[i]
-	
-	strconcat statstr tmp
-	statusbox statstr hostname
+		strconcat tmp files[i]
 		
-	statstr = statstr_tmp
+		strconcat statstr tmp
+		statusbox statstr hostname
+		statstr = statstr_tmp
+	endif	
+
 	strconcat delstr files[i]
 	sendln delstr
 	

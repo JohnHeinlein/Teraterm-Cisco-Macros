@@ -20,6 +20,7 @@ CRITICAL_FILES = '((PTW)|(SE[0-9])|(E(X?)[0-9])|(\.bin)|(\.conf)|(\.lic)|(\.pkg)
 ; | debug = 1 -> Some extra logging
 ; | debug = 2 -> Log entry & exit of subroutines
 ; '--------------------------------------
+stat_mode = 0 ; Set to enable status box messages at all
 debug_mode = 0
 totest = '' ; If none is specified, 'debug_mode = 1' just enables debug messages.
 if debug_mode > 0 call debug
@@ -27,14 +28,16 @@ if debug_mode > 0 call debug
 ; .======================================
 ; | init
 ; '--------------------------------------
-statstr = ''
-newstat = ''
-gethostname hostname
-statusbox statstr hostname
+if stat_mode then
+	statstr = ''
+	newstat = ''
+	gethostname hostname
+	statusbox statstr hostname
 
-newstat = hostname
-strconcat newstat ' init'
-include stat
+	newstat = hostname
+	strconcat newstat ' init'
+	include stat
+endif
 
 ; .======================================
 ; | Model selector
@@ -93,24 +96,22 @@ if result = 1 then
 	if result = 0 goto no_match
 endif
 
-
 :finish
-if debug_mode = 0 then
-	clearscreen 1
-	include dir_flash
-endif
+	if debug_mode = 0 then
+		clearscreen 1
+		include dir_flash
+	endif
 
-gethostname hostname
-endMessage = #10#10
-strconcat endMessage hostname
-strconcat endMessage ' finished!'
-strconcat statstr endMessage
-messagebox statstr 'Done!'
-
+	gethostname hostname
+	endMessage = #10#10
+	strconcat endMessage hostname
+	strconcat endMessage ' finished!'
+	strconcat statstr endMessage
+	messagebox statstr 'Done!'
 end
 
 :no_match
-messagebox 'No supported device detected, exiting' 'Err'
+	messagebox 'No supported device detected, exiting' 'Err'
 end
 
 :debug

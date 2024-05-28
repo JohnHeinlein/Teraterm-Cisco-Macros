@@ -10,6 +10,9 @@
 ; | util\debug.ttl checks debug status and prefaces 
 ; | newlines with [DEBUG] before calling this file.
 ; '--------------------------------------
+
+if stat_mode = 0 exit ; Exit immediately if we don't want output
+
 ifdefined statstr
 if result = 0 statstr = ''
 
