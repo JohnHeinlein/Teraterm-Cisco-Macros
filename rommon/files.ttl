@@ -12,6 +12,7 @@ setsync 1
 ;wait #10'switch:'
 send #13
 send 'del flash:confi' ; For whatever reason, we can sometimes only send 16 characters. Extremely suspicious, idk man
+pause 2
 send 'g.text'
 send #13
 wait '(y/n)?'
