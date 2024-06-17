@@ -39,6 +39,7 @@ Additionally, I've probably abused some language features. TTL is almost as old 
   - WS-C2960X-48LPS-L
 - 3000 series switches (C3750E, CAT3K)
   - WS-C3750X-24P-S
+  - WS-C3750X-48PF-S
   - WS-C3650-24TS-E
   - WS-C3650-24PS-S
 - Integrated service routers
