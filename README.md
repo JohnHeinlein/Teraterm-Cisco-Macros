@@ -47,6 +47,8 @@ Additionally, I've probably abused some language features. TTL is almost as old 
 - Integrated service routers
   - ISR4331 (See [FN64253](https://www.cisco.com/c/en/us/support/docs/field-notices/642/fn64253.html))
   - 2901
+- Aggregate Service Routers
+  - ASR1002-X
 - Gateways
   - VG310 (Detected as a router)
 - Adaptive Security Appliances
