@@ -11,7 +11,9 @@ Additionally, I've probably abused some language features. TTL is almost as old 
 > 
 > 'Essential file' is determined by matching the regular expression found in `util/flash_wipe.ttl`:
 > 
-> `((PTW)|(SE[0-9])|(E(X?)[0-9])|(\.bin)|(\.conf)|(\.lic)|(\.pkg)|(\.pack)$)`
+> `((SPA)|(PTW)|(SE[0-9])|(E(X?)[0-9])|(\.bin)|(\.conf)|(\.lic)|(\.pkg)|(\.pack)$)`
+> 
+> (Essentially a list of file extensions)
 
 > [!NOTE]
 > I recommend notepad++ with [TTL Language support](https://github.com/notepad-plus-plus/userDefinedLanguages/blob/master/UDLs/TeraTermLanguage_allCmdsV4.xml) from NPP's official repo to edit files.
@@ -47,6 +49,8 @@ Additionally, I've probably abused some language features. TTL is almost as old 
   - 2901
 - Gateways
   - VG310 (Detected as a router)
+- Adaptive Security Appliances
+  - ASA 5516-X (Only one unit so far)
 
 > [!NOTE]
 > More models than listed may work, given a ROMMON & OS structure similar to existing models.
@@ -61,7 +65,6 @@ Additionally, I've probably abused some language features. TTL is almost as old 
   - Many are re-used as functions to list the flash directory, build a file array, or for logging
 - Proper logging
   - Currently only uses `statusbox` with a bunch of custom logic in `stat.ttl` and `db.ttl`.
-
 # Known issues
 - After boot, many systems will continue to spam console with diagnostic information as stdout
   - Potentially messes up anything that requires newlines (`waitln`, `recvln`, etc.)
