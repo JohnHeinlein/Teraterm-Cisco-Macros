@@ -1,8 +1,9 @@
 ; .======================================
 ; | Driver for all macro files
 ; |--------------------------------------
-; | Determines the type of device being run, and
-; |	calls appropriate subroutines
+; | Determines the type of device being run, and calls appropriate subroutines
+; |	Language documentation: https://teratermproject.github.io/manual/4/en/macro/
+; | Repo for this project: https://github.com/JohnHeinlein/Teraterm-Cisco-Macros
 ; '--------------------------------------
 
 ; Useful string aliases
@@ -10,23 +11,31 @@ dir_flash = 'util\dir_flash.ttl'
 stat = 'util\stat.ttl'
 db = 'util\debug.ttl'
 db2 = 'util\debug2.ttl'
-CRITICAL_FILES = '((PTW)|(SE[0-9])|(E(X?)[0-9])|(\.bin)|(\.conf)|(\.lic)|(\.pkg)|(\.pack)$)' ; Regular expression matching files we DON'T want to delete
+CRITICAL_FILES = '((SPA)|(PTW)|(SE[0-9])|(E(X?)[0-9])|(\.bin)|(\.conf)|(\.lic)|(\.pkg)|(\.pack)$)' ; Regular expression matching files we DON'T want to delete
 
+; Used in some functions as a cross-routine message.
+; Currently only used in flash_wipe to determine which flags are supported on the 'delete' command
+; Set at the start of the appropriate rommon file
+DEVICE = '' 
 ; .======================================
 ; | Debugging
 ; |--------------------------------------
 ; | Running files directly messes up the relative paths.
-; | Set 'totest' to path & name of file to test
+; | Set 'totest' to the relative path of the file you want to debug.
 ; | debug = 1 -> Some extra logging
 ; | debug = 2 -> Log entry & exit of subroutines
 ; '--------------------------------------
-stat_mode = 0 ; Set to enable status box messages at all
+
+; Set to enable status box messages.
+; The downside is that this can pull focus from other windows  & virtual desktops
+stat_mode = 0
+
 debug_mode = 0
 totest = '' ; If none is specified, 'debug_mode = 1' just enables debug messages.
-if debug_mode > 0 call debug
+if debug_mode > 0 call debug ; At the end of this file. Initializes debugging & calls `totest`
 
 ; .======================================
-; | init
+; | Initialize verbosity, if enabled
 ; '--------------------------------------
 if stat_mode then
 	statstr = ''
@@ -44,11 +53,11 @@ endif
 ; |--------------------------------------
 ; | Once in ROMMON, we use some heuristic to determine the model of switch.
 ; | Not trivial, since different switches can have dramatically different 
-; | bootloaders and rom monitors
+; | bootloaders and rom monitors.
 ; '--------------------------------------
 setsync 1
 sendln 'version'
-recvln ; First captures the command i just sent? lol
+recvln ; Weirdly, triggers on 'version' unless we have this receive. Probably sync shenanigans
 recvln
 setsync 0
 if result = 1 then
@@ -59,7 +68,7 @@ if result = 1 then
 		include stat
 		include 'rommon\2960.ttl'
 		include 'os\switch.ttl'
-		goto finish
+		goto finish ; Prevents falling through to each check (if/else chains would look at lot worse)
 	endif
 	
 	; Catalyst 3000 Series Switches
@@ -75,7 +84,7 @@ if result = 1 then
 	; Catalyst 3750 series switches
 	strmatch inputstr '^C([0-9]){4}[A-Z]?\s'
 	if result = 1 then
-		newstat = '**C3750 ROMMON Detected**'
+		newstat = '**Other Catalyst ROMMON Detected**'
 		include stat
 		include 'rommon\2960.ttl'
 		include 'os\switch.ttl'
@@ -83,14 +92,34 @@ if result = 1 then
 	endif
 	
 	; Detect any 'rommon' prompt, as opposed to a 'switch' prompt, to assume we're in a router.
+	; Typically triggers when the 'version' command fails, as this generally indicates the unit is NOT a switch.
 	timeout = 1
 	waitregex 'rommon [0-9]+'
 	if result > 0 then
-		newstat = #10'Router assumed'
-		include stat
-		include 'rommon\isr.ttl'
-		include 'os\router.ttl'
-		goto finish
+		; Check for ASA, since they use disk0: for the SSD wheras routers will err on `dir`
+		sendln 'dir'
+		recvln
+		recvln
+		
+		; Router
+		strmatch inputstr 'Incorrect Usage'
+		if result > 0 then		
+			newstat = #10'Router assumed'
+			include stat
+			include 'rommon\isr.ttl'
+			include 'os\router.ttl'
+			goto finish
+		endif
+		
+		; Security Appliance
+		strmatch inputstr 'device table'
+		if result > 0 then
+			newstat = #10'ASA assumed'
+			include stat
+			include 'rommon\asa.ttl'
+			include 'os\security.ttl'
+			goto finish
+		endif
 	endif
 	
 	if result = 0 goto no_match

@@ -105,11 +105,15 @@ endif
 newstat = #10'Deleting files...'
 include stat
 
-for i 0 (delnum - 1)
-	; Will need to change this for devices that don't accept flags.
-	; Should just be a check after the command fails
+; Determine which flags the delete statement accepts
+strmatch DEVICE 'asa'
+if result > 0 then
+	delstr = 'del /recursive /noconfirm disk0:'
+else
 	delstr = 'del /r /f flash:'
-	
+endif
+
+for i 0 (delnum - 1)
 	; dynamically update deletion progress
 	if stat_mode then
 		statstr_tmp = statstr ; cache statstr
@@ -131,8 +135,7 @@ for i 0 (delnum - 1)
 	strconcat delstr files[i]
 	sendln delstr
 	
-	; Doesn't seem to like the spam of not waiting, sometimes crashes and returns to master.ttl
-	waitregex '^(([Ss]witch)|([rR]outer))[#>:]'
+	waitregex '^(([Ss]witch)|([rR]outer)|(ciscoasa))[#>:]'
 next
 
 newstat = ' done!'

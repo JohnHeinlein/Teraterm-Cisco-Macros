@@ -1,0 +1,21 @@
+; .=====================================
+; | ROMMON for ASA devices
+; | =====================================
+; | - Set confreg to ignore configs
+; | - Reboot to wipe dynamically
+; '--------------------------------------
+newstat = #10'Entering rommon/asa.ttl'
+include db2
+
+DEVICE = 'asa'
+
+sendln 'confreg 0x2142' ; Unsure if the config register is universal. ASAs seem to ignore the 2nd byte ('1')
+wait 'rommon'
+sendln 'boot'
+
+newstat =  #10'Booting SECURITY APPLIANCE...'
+include stat
+
+newstat = #10'Exiting rommon/asa.ttl'
+include db2
+exit

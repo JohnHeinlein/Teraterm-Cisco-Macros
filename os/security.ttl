@@ -1,0 +1,68 @@
+; .======================================
+; | Cisco ASA wiping macro
+; |======================================
+; | - Wait for boot
+; | - Wait for stdout to clear once the cmd loads (console spam)
+; | - Call subroutines to generate and execute wipe commands dynamically
+; | - Clear NVRAM to prompt initial setup dialog on next boot
+; | - Reboot to restore confreg in ROMMON
+; '--------------------------------------
+newstat = #10'Entering os/security.ttl'
+include db2
+
+do
+	waitregex 'ciscoasa>' '\[yes\]'
+	if result = 2 then
+		sendln 'no' ; Skip setup
+	endif
+loop while result != 1
+
+wait 'ciscoasa>'
+sendln 'enable'
+wait 'Password:'
+send #13
+wait 'ciscoasa#'
+
+; .======================================
+; | Wipe flash
+; '--------------------------------------
+include 'util\flash_wipe.ttl'
+
+; .======================================
+; | Wipe NVRAM
+; '--------------------------------------
+newstat = #10'Clearing NVRAM...'
+include stat
+
+send #13
+wait 'ciscoasa#'
+sendln 'write erase'
+wait '[confirm]'
+send #13
+wait 'ciscoasa#'
+pause 1
+
+newstat = ' done!'
+include stat
+
+; .======================================
+; | Re-enable console logging
+; '--------------------------------------
+newstat = #10'Resetting confreg...'
+include stat
+
+wait 'ciscoasa#'
+sendln 'configure terminal'
+wait 'ciscoasa(config)#'
+sendln 'config-register 0x2102'
+wait 'ciscoasa(config)#'
+sendln 'exit'
+
+include dir_flash
+
+newstat = ' done!'
+include stat
+
+newstat = #10'Exiting os/security.ttl'
+include db2
+exit
