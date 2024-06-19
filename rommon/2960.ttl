@@ -8,6 +8,8 @@
 newstat = #10'Entering rommon/2960.ttl'
 include db2
 
+DEVICE = 'switch'
+
 timeout = 0
 setsync 1
 

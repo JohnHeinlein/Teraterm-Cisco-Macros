@@ -1,5 +1,5 @@
 ; .=====================================
-; | 4000 Series Integrated Series Router ROMMON Wipe
+; | ROMMON for routers
 ; | =====================================
 ; | - Set confreg to ignore configs
 ; | - Reboot to wipe dynamically
@@ -7,7 +7,9 @@
 newstat = #10'Entering rommon/isr.ttl'
 include db2
 
-sendln 'confreg 0x2142'
+DEVICE = 'router'
+
+sendln 'confreg 0x2142' ; Unsure if the config register is universal. ASAs seem to ignore the 2nd byte ('1')
 wait 'rommon'
 sendln 'reset'
 
@@ -19,7 +21,7 @@ include stat
 ; '--------------------------------------
 timeout = 0
 
-do ; Some models will prompt for setup when the config is ignored.
+do 
 	waitregex 'Press RETURN' '\[yes/no\]'
 	if result = 1 send #13
 	if result = 2 sendln 'no'

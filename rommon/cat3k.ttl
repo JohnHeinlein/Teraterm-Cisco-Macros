@@ -4,6 +4,8 @@
 newstat = 'Entering rommon/cat3k.ttl'
 include db2
 
+DEVICE = 'switch'
+
 ; Bypass configs
 sendln 'set SWITCH_IGNORE_STARTUP_CFG 1'
 sendln 'set ENABLE_BREAK yes'
