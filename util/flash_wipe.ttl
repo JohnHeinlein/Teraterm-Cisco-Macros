@@ -114,6 +114,8 @@ else
 endif
 
 for i 0 (delnum - 1)
+	toSend = '' ; Reset command string
+	
 	; dynamically update deletion progress
 	if stat_mode then
 		statstr_tmp = statstr ; cache statstr
@@ -132,8 +134,9 @@ for i 0 (delnum - 1)
 		statstr = statstr_tmp
 	endif	
 
+	strconcat toSend delstr
 	strconcat delstr files[i]
-	sendln delstr
+	sendln toSend
 	
 	waitregex '^(([Ss]witch)|([rR]outer)|(ciscoasa))[#>:]'
 next
