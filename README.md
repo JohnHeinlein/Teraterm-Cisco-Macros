@@ -74,6 +74,6 @@ Additionally, I've probably abused some language features. TTL is almost as old 
   - CAT3K units have `configure terminal` options to disable logging
     - Only requires `wait` commands (no newlines), so is resistant to the spam   
 - `files.ttl`, which deletes common files from rommon, rarely only sends 16 characters at a time
-  - I genuinely have no idea how or why. I've just split 'send' commands into 16 char chunks whenever it happens
+  - Might be fixed as of 7/2/24
 - `wipe_flash.ttl` only has room for 200 files at a time. Arrays cap at 65536 (2^16) elements, but I haven't tested if larger values have any noticeable impact on memory or speed. They shouldn't, since those values are only initialized and not iterated over, but this language does weird stuff all the time.
 - Reboot breaks sometimes don't register. Sending a bunch of them seems to make it fail less. That's pretty cool.
