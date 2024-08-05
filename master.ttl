@@ -17,6 +17,7 @@ CRITICAL_FILES = '((SPA)|(PTW)|(SE[0-9])|(E(X?)[0-9])|(\.bin)|(\.conf)|(\.lic)|(
 ; Currently only used in flash_wipe to determine which flags are supported on the 'delete' command
 ; Set at the start of the appropriate rommon file
 DEVICE = '' 
+
 ; .======================================
 ; | Debugging
 ; |--------------------------------------
@@ -27,12 +28,12 @@ DEVICE = ''
 ; '--------------------------------------
 
 ; Set to enable status box messages.
-; The downside is that this can pull focus from other windows  & virtual desktops
+; The downside is that this can pull focus from other windows & virtual desktops
 stat_mode = 0
 
 debug_mode = 0
-totest = '' ; If none is specified, 'debug_mode = 1' just enables debug messages.
-if debug_mode > 0 call debug ; At the end of this file. Initializes debugging & calls `totest`
+totest = 'os\switch.ttl' ; If none is specified, 'debug_mode = 1' just enables debug messages.
+if debug_mode > 0 call debug ; Jump to the end of this file. Initializes debugging & calls `totest`
 
 ; .======================================
 ; | Initialize verbosity, if enabled
@@ -62,6 +63,7 @@ recvln
 setsync 0
 if result = 1 then
 	; Catalyst 2960 Series Switches
+	pause 1
 	strmatch inputstr '^C2960.?\s'	
 	if result = 1 then
 		newstat = '**C2960 ROMMON Detected**'
@@ -127,7 +129,7 @@ endif
 
 :finish
 	if debug_mode = 0 then
-		clearscreen 1
+		; clearscreen 1
 		include dir_flash
 	endif
 
@@ -152,6 +154,7 @@ end
 	strlen totest
 	if result > 0 then
 		include totest
+		messagebox statstr hostname
 		end
 	endif
 return

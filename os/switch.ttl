@@ -17,10 +17,30 @@ elseif result = 2 then
 endif
 sendln 'en'
 
+
+; .======================================
+; | Disable console logging
+; '--------------------------------------
+newstat =  #10'Configuring terminal logging...'
+include db
+
+waitregex 'Switch>' ; TESTING
+sendln 'no debug all' ; TESTING
+
+sendln 'configure terminal'
+wait 'Switch(config)#'
+sendln 'no logging console'
+wait 'Switch(config)#'
+sendln 'exit'
+
+newstat = ' done!'
+include db
+
 ; .======================================
 ; | Wait for stdout to finish spamming after boot.
 ; '--------------------------------------
-include 'util\stdout.ttl'
+;include 'util\stdout.ttl'
+; Shouldn't be necessary, as long as the above block properly disables logging
 
 ; .======================================
 ; | Wipe flash

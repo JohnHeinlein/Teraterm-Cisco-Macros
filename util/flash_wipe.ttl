@@ -13,7 +13,6 @@ include db2
 ; Cache globals
 old_timeout = timeout
 
-
 if debug_mode = 2 then
 	newstat = #10'[DEBUG] Creating fake dirs...'
 	include stat
@@ -36,7 +35,7 @@ strdim files 200  ; String array of len 200
 filenum = 0
 delnum = 0
 savenum = 0
-timeout = 1
+timeout = 5
 
 do
 	recvln
