@@ -136,9 +136,9 @@ endif
 	gethostname hostname
 	endMessage = #10#10
 	strconcat endMessage hostname
-	strconcat endMessage ' finished!'
+	strconcat endMessage ' finished! Run again?'
 	strconcat statstr endMessage
-	yesnobox statstr 'Done! Run again?'
+	yesnobox statstr 'Done!'
 	if result goto start ;
 end
 
