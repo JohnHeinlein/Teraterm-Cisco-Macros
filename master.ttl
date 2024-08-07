@@ -5,7 +5,7 @@
 ; |	Language documentation: https://teratermproject.github.io/manual/4/en/macro/
 ; | Repo for this project: https://github.com/JohnHeinlein/Teraterm-Cisco-Macros
 ; '--------------------------------------
-
+:start
 ; Useful string aliases
 dir_flash = 'util\dir_flash.ttl'
 stat = 'util\stat.ttl'
@@ -56,7 +56,6 @@ endif
 ; | Not trivial, since different switches can have dramatically different 
 ; | bootloaders and rom monitors.
 ; '--------------------------------------
-:start
 setsync 1
 sendln 'version'
 recvln ; Weirdly, triggers on 'version' unless we have this receive. Probably sync shenanigans
