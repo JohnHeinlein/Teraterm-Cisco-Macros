@@ -46,6 +46,7 @@ Additionally, I've probably abused some language features. TTL is almost as old 
   - WS-C3650-24PS-S
 - Integrated service routers
   - ISR4331 (See [FN64253](https://www.cisco.com/c/en/us/support/docs/field-notices/642/fn64253.html))
+  - ISR4431
   - 2901
 - Aggregate Service Routers
   - ASR1002-X
