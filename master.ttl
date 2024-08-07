@@ -56,6 +56,7 @@ endif
 ; | Not trivial, since different switches can have dramatically different 
 ; | bootloaders and rom monitors.
 ; '--------------------------------------
+:start
 setsync 1
 sendln 'version'
 recvln ; Weirdly, triggers on 'version' unless we have this receive. Probably sync shenanigans
@@ -138,7 +139,8 @@ endif
 	strconcat endMessage hostname
 	strconcat endMessage ' finished!'
 	strconcat statstr endMessage
-	messagebox statstr 'Done!'
+	yesnobox statstr 'Done! Run again?'
+	if result goto start ;
 end
 
 :no_match
