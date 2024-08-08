@@ -50,8 +50,8 @@ endif
 ; | stat_mode = 1 -> Basic verbosity. Can pull focus from other desktops and windows
 ; |
 ; '--------------------------------------
-debug_mode = 1
-totest = 'util\flash_wipe.ttl'
+debug_mode = 0
+totest = ''
 
 if debug_mode > 0 call debug ; Contined at the end of this file
 
