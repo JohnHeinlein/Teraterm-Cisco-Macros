@@ -6,6 +6,7 @@
 ; | Repo for this project: https://github.com/JohnHeinlein/Teraterm-Cisco-Macros
 ; '--------------------------------------
 :start
+
 ; Useful string aliases
 dir_flash = 'util\dir_flash.ttl'
 stat = 'util\stat.ttl'
@@ -16,28 +17,16 @@ CRITICAL_FILES = '((SPA)|(PTW)|(SE[0-9])|(E(X?)[0-9])|(\.bin)|(\.conf)|(\.lic)|(
 ; Used in some functions as a cross-routine message.
 ; Currently only used in flash_wipe to determine which flags are supported on the 'delete' command
 ; Set at the start of the appropriate rommon file
-DEVICE = '' 
+DEVICE = ''
 
 ; .======================================
-; | Debugging
+; | Verbosity
 ; |--------------------------------------
-; | Running files directly messes up the relative paths.
-; | Set 'totest' to the relative path of the file you want to debug.
-; | debug = 1 -> Some extra logging
-; | debug = 2 -> Log entry & exit of subroutines
+; | Note this is just dialog boxes, it does NOT use TeraTerm's built-in logging.
+; | I would like to add text logging at some point.
 ; '--------------------------------------
 
-; Set to enable status box messages.
-; The downside is that this can pull focus from other windows & virtual desktops
 stat_mode = 0
-
-debug_mode = 0
-totest = 'os\switch.ttl' ; If none is specified, 'debug_mode = 1' just enables debug messages.
-if debug_mode > 0 call debug ; Jump to the end of this file. Initializes debugging & calls `totest`
-
-; .======================================
-; | Initialize verbosity, if enabled
-; '--------------------------------------
 if stat_mode then
 	statstr = ''
 	newstat = ''
@@ -48,6 +37,23 @@ if stat_mode then
 	strconcat newstat ' init'
 	include stat
 endif
+
+; .======================================
+; | Debugging & Verbosity
+; |--------------------------------------
+; | Running files directly messes up the relative paths.
+; | Set 'totest' to the relative path of the file you want to debug.
+; | If 'totest' is blank, debugging messages are enabled and the macro runs as normal
+; |
+; | debug = 1 -> Some extra logging
+; | debug = 2 -> Log entry & exit of subroutines
+; | stat_mode = 1 -> Basic verbosity. Can pull focus from other desktops and windows
+; |
+; '--------------------------------------
+debug_mode = 1
+totest = 'util\flash_wipe.ttl'
+
+if debug_mode > 0 call debug ; Contined at the end of this file
 
 ; .======================================
 ; | Model selector
@@ -138,12 +144,21 @@ endif
 	strconcat endMessage hostname
 	strconcat endMessage ' finished! Run again?'
 	strconcat statstr endMessage
+	
 	yesnobox statstr 'Done!'
-	if result goto start ;
+	if result = 1 then
+		timeout = 0
+		goto start
+	endif
+	end
 end
 
 :no_match
-	messagebox 'No supported device detected, exiting' 'Err'
+	yesnobox 'No supported device detected, exit?' 'Err'
+	if result = 0 then
+		timeout = 0
+		goto start
+	endif
 end
 
 :debug
@@ -155,7 +170,7 @@ end
 	strlen totest
 	if result > 0 then
 		include totest
-		messagebox statstr hostname
+		if stat_mode = 1 messagebox statstr hostname
 		end
 	endif
 return

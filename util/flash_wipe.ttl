@@ -31,7 +31,7 @@ newstat = #10'Parsing files...'
 include stat
 
 ; No way I can tell to size the array prior, unless two separate 'dir flash' commands are run or arrays are reconstructed every step at O(n!)
-strdim files 200  ; String array of len 200
+strdim files 200
 filenum = 0
 delnum = 0
 savenum = 0
