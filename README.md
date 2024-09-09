@@ -68,6 +68,7 @@ Additionally, I've probably abused some language features. TTL is almost as old 
   - Many are re-used as functions to list the flash directory, build a file array, or for logging
 - Proper logging
   - Currently only uses `statusbox` with a bunch of custom logic in `stat.ttl` and `db.ttl`.
+- Some kind of multiplexing to allow more than a few instances to be easily managed
 # Known issues
 - After boot, many systems will continue to spam console with diagnostic information as stdout
   - Potentially messes up anything that requires newlines (`waitln`, `recvln`, etc.)
@@ -78,3 +79,4 @@ Additionally, I've probably abused some language features. TTL is almost as old 
   - Might be fixed as of 7/2/24
 - `wipe_flash.ttl` only has room for 200 files at a time. Arrays cap at 65536 (2^16) elements, but I haven't tested if larger values have any noticeable impact on memory or speed. They shouldn't, since those values are only initialized and not iterated over, but this language does weird stuff all the time.
 - Reboot breaks sometimes don't register. Sending a bunch of them seems to make it fail less. That's pretty cool.
+- Prompt to re-run doesn't seem to work properly. Some variable is likely dangling that I haven't noticed.
