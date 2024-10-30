@@ -7,9 +7,12 @@
 newstat = #10'Entering rommon/asa.ttl'
 include db2
 
+confreg_ignore = 'confreg 0x2142' ; Send in ROMMON to ignore config
+confreg_def = 'configure-terminal 0x2102' ; To be sent from the os file to avoid re-entering ROMMON
+
 DEVICE = 'asa'
 
-sendln 'confreg 0x2142' ; Unsure if the config register is universal. ASAs seem to ignore the 2nd byte ('1')
+sendln confreg_ignore ; Unsure if the config register is universal. ASAs seem to ignore the 2nd byte ('1')
 wait 'rommon'
 sendln 'boot'
 

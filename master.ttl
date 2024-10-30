@@ -102,7 +102,7 @@ if result = 1 then
 	; Detect any 'rommon' prompt, as opposed to a 'switch' prompt, to assume we're in a router.
 	; Typically triggers when the 'version' command fails, as this generally indicates the unit is NOT a switch.
 	timeout = 1
-	waitregex 'rommon [0-9]+'
+	waitregex 'rommon #?[0-9]+'
 	if result > 0 then
 		; Check for ASA, since they use disk0: for the SSD wheras routers will err on `dir`
 		sendln 'dir'
@@ -127,6 +127,14 @@ if result = 1 then
 			include 'rommon\asa.ttl'
 			include 'os\security.ttl'
 			goto finish
+		endif
+		
+		strmatch inputstr 'Invalid or incorrect command'
+		if result > 0 then
+			newstat = #10'ASA5525?'
+			include stat
+			include 'rommon\asa_5525.ttl'
+			include 'os\security.ttl'
 		endif
 	endif
 	

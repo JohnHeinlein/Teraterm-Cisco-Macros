@@ -53,8 +53,12 @@ include stat
 
 wait 'ciscoasa#'
 sendln 'configure terminal'
-wait 'ciscoasa(config)#'
-sendln 'config-register 0x2102'
+waitregex 'ciscoasa(config)#' '\[Y\]es, \[N\]o, \[A\]sk later:'
+if result = 2 then
+	sendln 'n'
+	wait 'ciscosasa(config)#'
+endif
+sendln confreg_def
 wait 'ciscoasa(config)#'
 sendln 'exit'
 

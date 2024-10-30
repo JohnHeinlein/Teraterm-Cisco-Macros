@@ -1,0 +1,25 @@
+; .=====================================
+; | ROMMON for ASA devices
+; | =====================================
+; | - Set confreg to ignore configs
+; | - Reboot to wipe dynamically
+; '--------------------------------------
+newstat = #10'Entering rommon/asa_5525.ttl'
+include db2
+
+confreg_ignore = 'confreg 0x00010040' ; Send in ROMMON to ignore config
+confreg_def = 'config-register 0x00010000' ; To be sent from the os file to avoid re-entering ROMMON
+
+DEVICE = 'asa5525'
+
+tmp = ''
+sendln confreg_ignore
+wait 'rommon'
+sendln 'boot'
+
+newstat =  #10'Booting ASA5525...'
+include stat
+
+newstat = #10'Exiting rommon/asa_5525.ttl'
+include db2
+exit
