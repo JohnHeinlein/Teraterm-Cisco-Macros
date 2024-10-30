@@ -23,8 +23,9 @@ include stat
 
 timeout = 0
 do
-	waitregex 'Press RETURN' 'not configured to boot automatically'
+	waitregex 'Press RETURN' 'not configured to boot automatically' 'Would you like to enter the initial configuration'
 	if result = 2 sendln 'boot'
+	if result = 3 sendln 'no'
 loop while result != 1
 
 newstat = ' done!'
